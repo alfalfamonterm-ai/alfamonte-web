@@ -34,7 +34,7 @@ function CheckoutContent() {
     // Modes
     const mode = searchParams.get('mode');
     const productId = searchParams.get('product_id');
-    const isSubscription = mode === 'subscription' && productId;
+    const isSubscription = mode === 'subscription' && !!productId;
 
     const [loading, setLoading] = useState(false);
     const [subProduct, setSubProduct] = useState<any>(null);
