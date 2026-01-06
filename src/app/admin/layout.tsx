@@ -6,7 +6,7 @@ export default function AdminLayout({
     children: React.ReactNode;
 }) {
     return (
-        <div className="min-h-screen bg-gray-100 flex text-gray-900">
+        <div className="min-h-screen bg-gray-100 flex">
             {/* Sidebar */}
             <aside className="w-64 bg-[#2D4A3E] text-white flex-shrink-0 hidden md:block">
                 <div className="p-6">
@@ -31,11 +31,20 @@ export default function AdminLayout({
                     <Link href="/admin/orders" className="block px-4 py-3 rounded-lg hover:bg-white/10 transition-colors">
                         🛒 Pedidos
                     </Link>
+                    <Link href="/admin/logistics" className="block px-4 py-3 rounded-lg hover:bg-white/10 transition-colors">
+                        🚚 Logística
+                    </Link>
                     <Link href="/admin/sales/products" className="block px-4 py-3 rounded-lg hover:bg-white/10 transition-colors">
                         🏷️ Productos Web
                     </Link>
                     <Link href="/admin/crm" className="block px-4 py-3 rounded-lg hover:bg-white/10 transition-colors">
                         👥 CRM Clientes
+                    </Link>
+                    <Link href="/admin/audit" className="block px-4 py-3 rounded-lg hover:bg-white/10 transition-colors">
+                        🛡️ Registro de Auditoría
+                    </Link>
+                    <Link href="/admin/settings" className="block px-4 py-3 rounded-lg hover:bg-white/10 transition-colors">
+                        ⚙️ Configuración Web
                     </Link>
                     <div className="pt-8 border-t border-white/10 mt-8">
                         <Link href="/" className="block px-4 py-3 rounded-lg hover:bg-white/10 transition-colors text-yellow-200 text-sm">
