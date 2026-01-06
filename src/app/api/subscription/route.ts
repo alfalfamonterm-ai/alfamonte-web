@@ -37,7 +37,7 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({
             id: result.id,
             init_point: result.init_point,
-            sandbox_init_point: result.sandbox_init_point
+            sandbox_init_point: (result as any).sandbox_init_point
         });
 
     } catch (error: any) {
