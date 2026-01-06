@@ -3,7 +3,7 @@ export type CustomerStatus = 'active' | 'inactive' | 'blocked';
 
 export interface Customer {
     id: string;
-    customer_number?: string; // NEW: C-0001, C-0002, etc.
+    customer_number?: string;
     name: string;
     email?: string;
     phone?: string;
@@ -15,7 +15,7 @@ export interface Customer {
     last_purchase_date?: string;
     created_at?: string;
     notes?: string;
-    data_complete?: boolean; // NEW: Flag for incomplete customer data
+    data_complete?: boolean;
 }
 
 export interface CreateCustomerDTO {
