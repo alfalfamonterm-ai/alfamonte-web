@@ -47,7 +47,7 @@ export async function POST(req: NextRequest) {
                     },
                     address: {
                         street_name: customer.street,
-                        street_number: Number(customer.number),
+                        street_number: String(customer.number),
                     },
                 },
                 back_urls: {
