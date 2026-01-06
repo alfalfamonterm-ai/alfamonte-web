@@ -3,8 +3,8 @@
 import { useState } from 'react';
 import { initMercadoPago, Wallet } from '@mercadopago/sdk-react';
 
-// Initialize with Public Key - Supports standard and custom user env names
-initMercadoPago(process.env.N_P_MP_PUBLIC_KEY || process.env.NEXT_PUBLIC_MERCADO_PAGO_PUBLIC_KEY || process.env.NEXT_PUBLIC_MP_FRONTEND_KEY || process.env.MP_FRONTEND_KEY!);
+// Initialize with Public Key
+initMercadoPago(process.env.NEXT_PUBLIC_MERCADO_PAGO_PUBLIC_KEY || '');
 
 interface MercadoPagoButtonProps {
     product: {
@@ -42,9 +42,9 @@ export default function MercadoPagoButton({ product }: MercadoPagoButtonProps) {
 
     if (preferenceId) {
         return (
-            <Wallet 
-                initialization={{ preferenceId: preferenceId }} 
-                customization={{ texts: { valueProp: 'smart_option' } }} 
+            <Wallet
+                initialization={{ preferenceId: preferenceId }}
+                customization={{ texts: { valueProp: 'smart_option' } }}
             />
         );
     }
