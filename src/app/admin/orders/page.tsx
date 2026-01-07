@@ -44,7 +44,7 @@ const paymentStatusLabels: any = {
 
 
 export default function OrdersPage() {
-    const { orders, loading, selectedOrder, setSelectedOrder, updateStatus } = useOrderManager();
+    const { orders, loading, selectedOrder, setSelectedOrder, updateStatus, updatePaymentStatus } = useOrderManager();
     const [filter, setFilter] = useState('');
 
     const filteredOrders = orders.filter(o =>
@@ -96,7 +96,7 @@ export default function OrdersPage() {
                                     </div>
                                     <div className="flex justify-between text-sm text-gray-600">
                                         <div>{order.customer?.name || 'Invitado'}</div>
-                                        <div className="font-bold">${order.total_amount.toLocaleString()}</div>
+                                        <div className="font-bold">${order.total_amount.toLocaleString('es-CL')}</div>
                                     </div>
                                     <div className="text-xs text-gray-400 mt-2 flex gap-2">
                                         <span>{new Date(order.created_at).toLocaleDateString()}</span>
@@ -146,4 +146,32 @@ export default function OrdersPage() {
 
                         {/* Status Actions (Pago) - NUEVA SECCIÓN */}
                         <div className="bg-gray-50 p-4 rounded-xl border border-gray-200">
-                            <label className="block text-xs font-
+                            <label className="block text-xs font-bold text-gray-400 uppercase mb-2">Cambiar Estado de Pago</label>
+                            <div className="flex flex-wrap gap-2">
+                                {['pending', 'paid', 'failed', 'refunded', 'processing'].map(s => (
+                                    <button
+                                        key={s}
+                                        onClick={() => updatePaymentStatus(selectedOrder.id, s)} // Asume que existe updatePaymentStatus en el hook
+                                        className={`px-3 py-1 text-xs rounded-lg border font-bold transition-all ${selectedOrder.payment_status === s
+                                            ? 'bg-[#2D4A3E] text-white border-[#2D4A3E]'
+                                            : 'bg-white text-gray-600 hover:bg-gray-100'}`}
+                                    >
+                                        {paymentStatusLabels[s]}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                        
+                        {/* Summary & Customer Data */}
+                        <div className="grid grid-cols-2 gap-8">
+                            <div>
+                                <h3 className="text-sm font-bold text-gray-800 mb-2">Resumen del Pedido</h3>
+                                <div className="space-y-1 text-sm text-gray-600">
+                                    <div className="flex justify-between">
+                                        <span>Subtotal:</span>
+                                        <span className="font-medium">${selectedOrder.total_amount.toLocaleString('es-CL')}</span>
+                                    </div>
+                                    {/* Asumo que el envío está incluido o es cero, esto es placeholder si no hay desglose en el objeto */}
+                                    <div className="flex justify-between border-t border-dashed mt-2 pt-2">
+                                        <span className="font-bold text-base">Total:</span>
+                                        <span className="font

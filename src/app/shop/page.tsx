@@ -25,19 +25,6 @@ export default function ShopPage() {
     const [loading, setLoading] = useState(true);
     const [activeCategory, setActiveCategory] = useState<Category | 'all'>('all');
 
-<<<<<<< HEAD
-=======
-    const categories: { id: Category | 'all', label: string }[] = [
-        { id: 'all', label: 'Todos' },
-        { id: 'conejo-junior', label: '🐰 Conejo Bebé' }, // These IDs must match DB 'category' values? No, DB uses 'Conejos', 'Cobayas'.
-        // I need to map UI "Filter IDs" to DB "Category" values.
-        // DB Categories: 'Conejos', 'Cobayas', 'Chinchillas', 'Roedores', 'Aves'
-        // UI IDs defined here: 'conejo-junior', 'conejo-adulto' etc are from legacy code.
-        // User asked for "Categories". I should align properly.
-        // I will update filter Buttons to match DB categories.
-    ];
-
->>>>>>> 4af7fc6 (Fix: Aplicado downgrade de Next.js y React a versiones estables)
     const dbCategories = [
         { id: 'all', label: 'Todos' },
         { id: 'Conejos', label: '🐰 Conejos' },
@@ -66,11 +53,7 @@ export default function ShopPage() {
 
     const filteredProducts = activeCategory === 'all'
         ? products
-        : products.filter(p => p.category === activeCategory); // Strict match for now? Or fuzzy?
-<<<<<<< HEAD
-=======
-    // DB 'category' is 'Conejos'. Filter 'Conejos' matches.
->>>>>>> 4af7fc6 (Fix: Aplicado downgrade de Next.js y React a versiones estables)
+        : products.filter(p => p.category === activeCategory);
 
     return (
         <main className="min-h-screen pt-24 pb-12 bg-[#F4F1EA]">
@@ -108,11 +91,7 @@ export default function ShopPage() {
                         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#2D4A3E] mx-auto"></div>
                         <p className="mt-4 text-gray-500">Cargando productos frescos...</p>
                     </div>
-<<<<<<< HEAD
                 ) : null}
-=======
-                ) : null} {/* Removed the else branch here */}
->>>>>>> 4af7fc6 (Fix: Aplicado downgrade de Next.js y React a versiones estables)
 
                 {!loading && filteredProducts.length > 0 && (
                     <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">

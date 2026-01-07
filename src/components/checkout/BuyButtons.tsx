@@ -9,9 +9,7 @@ interface BuyButtonsProps {
     product: any;
 }
 
-<<<<<<< HEAD
-=======
-// Fallback mapping in case DB isn't synced yet
+// Fallback mapping in case DB isn't synced yet (Importado de 4af7fc6)
 const PLAN_MAPPING: Record<string, string> = {
     "efc17835-c06c-4b87-8aeb-8a2e1f53dc6e": "519be37caa104dd097de1723f9719b94",
     "1a234bd9-c01f-4c1e-a926-b86c5b67b0cb": "18899ffcb40d43d1b78ee363451e2467",
@@ -25,15 +23,11 @@ const PLAN_MAPPING: Record<string, string> = {
     "0c5d1620-68f5-4dc0-a891-f6da3b6d55f0": "9e1fc601f33b4455b01e911cb7834d31"
 };
 
->>>>>>> 4af7fc6 (Fix: Aplicado downgrade de Next.js y React a versiones estables)
 export default function BuyButtons({ product }: BuyButtonsProps) {
     const { addToCart } = useCart();
     const router = useRouter();
     const [showSuccess, setShowSuccess] = useState(false);
-<<<<<<< HEAD
-=======
-    const [loadingSub, setLoadingSub] = useState(false);
->>>>>>> 4af7fc6 (Fix: Aplicado downgrade de Next.js y React a versiones estables)
+    const [loadingSub, setLoadingSub] = useState(false); // Añadido de 4af7fc6
 
     const subscriptionPrice = product.price;
     const oneTimePrice = calculatePrice(product.price, false);
@@ -44,16 +38,12 @@ export default function BuyButtons({ product }: BuyButtonsProps) {
         setTimeout(() => setShowSuccess(false), 2000);
     };
 
-<<<<<<< HEAD
-    const handleSubscribe = () => {
-=======
-    const handleSubscribe = async () => {
+    const handleSubscribe = async () => { // Cambiado a async de 4af7fc6
+        // Comentarios de 4af7fc6:
         // Real subscriptions don't go to the cart usually, they are a direct commitment.
         // But for this MVP, let's keep it simple: redirect to checkout if we need data, 
         // OR if we already have it (from session), start the MP flow.
-
         // Strategy: Redirect to /checkout?mode=subscription&product_id=...
->>>>>>> 4af7fc6 (Fix: Aplicado downgrade de Next.js y React a versiones estables)
         router.push(`/checkout?mode=subscription&product_id=${product.id}`);
     };
 
@@ -81,10 +71,7 @@ export default function BuyButtons({ product }: BuyButtonsProps) {
                     fullWidth
                     variant="outline"
                     onClick={handleSubscribe}
-<<<<<<< HEAD
-=======
-                    disabled={loadingSub}
->>>>>>> 4af7fc6 (Fix: Aplicado downgrade de Next.js y React a versiones estables)
+                    disabled={loadingSub} // Añadido de 4af7fc6
                     className="py-4 text-lg border-2 border-[#2D4A3E]"
                 >
                     <div className="flex flex-col items-center">
