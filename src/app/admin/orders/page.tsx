@@ -4,6 +4,9 @@ import { useOrderManager } from '@/features/orders/hooks/useOrderManager';
 import { Package, Truck, CheckCircle, Clock, Search, Eye } from 'lucide-react';
 import { useState } from 'react';
 
+// --- Constantes para Estados ---
+
+// Colores de estado de ENVÍO (status)
 const statusColors: any = {
     pending: 'bg-yellow-100 text-yellow-700',
     paid: 'bg-blue-100 text-blue-700',
@@ -15,12 +18,30 @@ const statusColors: any = {
 
 const statusLabels: any = {
     pending: 'Pendiente',
-    paid: 'Pagado',
+    paid: 'Pagado (MP)',
     processing: 'Procesando',
     shipped: 'Enviado',
     delivered: 'Entregado',
     cancelled: 'Cancelado'
 };
+
+// Colores de estado de PAGO (payment_status)
+const paymentStatusColors: any = {
+    pending: 'bg-yellow-100 text-yellow-700',
+    paid: 'bg-green-100 text-green-700',
+    failed: 'bg-red-100 text-red-700',
+    refunded: 'bg-indigo-100 text-indigo-700',
+    processing: 'bg-blue-100 text-blue-700',
+};
+
+const paymentStatusLabels: any = {
+    pending: 'Pendiente',
+    paid: 'Pagado',
+    failed: 'Fallido',
+    refunded: 'Reembolsado',
+    processing: 'Procesando',
+};
+
 
 export default function OrdersPage() {
     const { orders, loading, selectedOrder, setSelectedOrder, updateStatus } = useOrderManager();
@@ -64,9 +85,14 @@ export default function OrdersPage() {
                                 >
                                     <div className="flex justify-between items-start mb-2">
                                         <div className="font-bold text-gray-800">#{order.id.slice(0, 8)}</div>
-                                        <span className={`text-xs px-2 py-1 rounded-full font-bold uppercase ${statusColors[order.status] || 'bg-gray-100'}`}>
-                                            {statusLabels[order.status] || order.status}
-                                        </span>
+                                        <div className="flex gap-2">
+                                            <span className={`text-xs px-2 py-1 rounded-full font-bold uppercase ${paymentStatusColors[order.payment_status] || 'bg-gray-100'}`}>
+                                                {paymentStatusLabels[order.payment_status] || order.payment_status}
+                                            </span>
+                                            <span className={`text-xs px-2 py-1 rounded-full font-bold uppercase ${statusColors[order.status] || 'bg-gray-100'}`}>
+                                                {statusLabels[order.status] || order.status}
+                                            </span>
+                                        </div>
                                     </div>
                                     <div className="flex justify-between text-sm text-gray-600">
                                         <div>{order.customer?.name || 'Invitado'}</div>
@@ -100,9 +126,9 @@ export default function OrdersPage() {
 
                     <div className="p-6 flex-1 overflow-y-auto space-y-8">
 
-                        {/* Status Actions */}
+                        {/* Status Actions (Envío) */}
                         <div className="bg-gray-50 p-4 rounded-xl border border-gray-200">
-                            <label className="block text-xs font-bold text-gray-400 uppercase mb-2">Cambiar Estado</label>
+                            <label className="block text-xs font-bold text-gray-400 uppercase mb-2">Cambiar Estado de Envío</label>
                             <div className="flex flex-wrap gap-2">
                                 {['pending', 'paid', 'processing', 'shipped', 'delivered', 'cancelled'].map(s => (
                                     <button
@@ -118,76 +144,6 @@ export default function OrdersPage() {
                             </div>
                         </div>
 
-                        {/* Items */}
-                        <div>
-                            <h3 className="font-bold text-gray-800 mb-4 flex items-center gap-2">
-                                <Package size={18} /> Productos
-                            </h3>
-                            <table className="w-full text-sm">
-                                <thead className="text-gray-400 bg-gray-50 border-b">
-                                    <tr>
-                                        <th className="py-2 text-left pl-2">Producto</th>
-                                        <th className="py-2 text-center">Cant</th>
-                                        <th className="py-2 text-right pr-2">Total</th>
-                                    </tr>
-                                </thead>
-                                <tbody className="divide-y">
-                                    {selectedOrder.items?.map(item => (
-                                        <tr key={item.id}>
-                                            <td className="py-3 pl-2 text-gray-800">{item.product_title}</td>
-                                            <td className="py-3 text-center text-gray-600">{item.quantity}</td>
-                                            <td className="py-3 text-right pr-2 font-bold">${item.total_price.toLocaleString()}</td>
-                                        </tr>
-                                    ))}
-                                </tbody>
-                                <tfoot className="border-t">
-                                    <tr>
-                                        <td colSpan={2} className="py-3 text-right text-gray-500 pr-4">Subtotal</td>
-                                        <td className="py-3 text-right font-bold">${selectedOrder.subtotal.toLocaleString()}</td>
-                                    </tr>
-                                    <tr>
-                                        <td colSpan={2} className="py-1 text-right text-gray-500 pr-4">Envío</td>
-                                        <td className="py-1 text-right font-bold">${selectedOrder.shipping_cost.toLocaleString()}</td>
-                                    </tr>
-                                    <tr className="text-lg">
-                                        <td colSpan={2} className="py-4 text-right font-bold text-[#2D4A3E] pr-4">Total</td>
-                                        <td className="py-4 text-right font-bold text-[#2D4A3E]">${selectedOrder.total_amount.toLocaleString()}</td>
-                                    </tr>
-                                </tfoot>
-                            </table>
-                        </div>
-
-                        {/* Customer Info */}
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                            <div>
-                                <h3 className="font-bold text-gray-800 mb-2 flex items-center gap-2">
-                                    <CheckCircle size={18} /> Cliente
-                                </h3>
-                                <div className="text-sm text-gray-600 bg-gray-50 p-4 rounded-xl border">
-                                    <p className="font-bold">{selectedOrder.customer?.name || 'Invitado'}</p>
-                                    <p>{selectedOrder.customer?.email}</p>
-                                    <p className="mt-2 text-xs text-gray-400">ID: {selectedOrder.customer_id || 'N/A'}</p>
-                                </div>
-                            </div>
-                            <div>
-                                <h3 className="font-bold text-gray-800 mb-2 flex items-center gap-2">
-                                    <Truck size={18} /> Envío
-                                </h3>
-                                <div className="text-sm text-gray-600 bg-gray-50 p-4 rounded-xl border">
-                                    <p className="font-bold capitalize">{selectedOrder.shipping_method || 'Por definir'}</p>
-                                    <p>{selectedOrder.shipping_address || 'Sin dirección registrada'}</p>
-                                </div>
-                            </div>
-                        </div>
-
-                    </div>
-                </div>
-            ) : (
-                <div className="hidden md:flex flex-1 bg-gray-50 rounded-2xl border border-dashed border-gray-300 items-center justify-center text-gray-400 flex-col gap-4">
-                    <Search size={48} className="opacity-20" />
-                    <p>Selecciona un pedido para ver detalles</p>
-                </div>
-            )}
-        </div>
-    );
-}
+                        {/* Status Actions (Pago) - NUEVA SECCIÓN */}
+                        <div className="bg-gray-50 p-4 rounded-xl border border-gray-200">
+                            <label className="block text-xs font-

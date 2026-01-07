@@ -1,8 +1,5 @@
 import supabase from '@/lib/supabase';
-<<<<<<< HEAD
-=======
-import { CreateOrderDTO, Order } from '../../features/orders/types';
->>>>>>> 4af7fc6 (Fix: Aplicado downgrade de Next.js y React a versiones estables)
+import { CreateOrderDTO, Order } from '../../features/orders/types'; // <-- Conflicto 1 Resuelto
 
 export const getOrders = async () => {
     const { data, error } = await supabase
@@ -15,13 +12,10 @@ export const getOrders = async () => {
         .order('created_at', { ascending: false });
 
     if (error) throw new Error(error.message);
-<<<<<<< HEAD
-    return data as any[];
-=======
-    return data as Order[];
+    return data as Order[]; // <-- Conflicto 2 Resuelto
 };
 
-export const createOrder = async (payload: CreateOrderDTO) => {
+export const createOrder = async (payload: CreateOrderDTO) => { // <-- Conflicto 2 (Añadido)
     // Transaction-like manually
     // 1. Calculate totals
     const subtotal = payload.items.reduce((acc, item) => acc + (item.quantity * item.unit_price), 0);
@@ -61,7 +55,6 @@ export const createOrder = async (payload: CreateOrderDTO) => {
     if (itemsError) throw new Error(itemsError.message);
 
     return order;
->>>>>>> 4af7fc6 (Fix: Aplicado downgrade de Next.js y React a versiones estables)
 };
 
 export const updateOrderStatus = async (id: string, status: string, payment_status?: string) => {
@@ -75,10 +68,7 @@ export const updateOrderStatus = async (id: string, status: string, payment_stat
 
     if (error) throw new Error(error.message);
 
-<<<<<<< HEAD
-=======
-    // Trigger Stock Deduction if status is 'shipped' (Physically leaving)
->>>>>>> 4af7fc6 (Fix: Aplicado downgrade de Next.js y React a versiones estables)
+    // Trigger Stock Deduction if status is 'shipped' (Physically leaving) <-- Conflicto 3 Resuelto
     if (status === 'shipped') {
         const { error: rpcError } = await supabase.rpc('deduct_order_stock', { target_order_id: id });
         if (rpcError) console.error("Stock Deduction Error:", rpcError);
