@@ -151,7 +151,7 @@ export default function OrdersPage() {
                                 {['pending', 'paid', 'failed', 'refunded', 'processing'].map(s => (
                                     <button
                                         key={s}
-                                        onClick={() => updatePaymentStatus(selectedOrder.id, s)} // Asume que existe updatePaymentStatus en el hook
+                                        onClick={() => updatePaymentStatus(selectedOrder.id, s)} 
                                         className={`px-3 py-1 text-xs rounded-lg border font-bold transition-all ${selectedOrder.payment_status === s
                                             ? 'bg-[#2D4A3E] text-white border-[#2D4A3E]'
                                             : 'bg-white text-gray-600 hover:bg-gray-100'}`}
@@ -171,7 +171,56 @@ export default function OrdersPage() {
                                         <span>Subtotal:</span>
                                         <span className="font-medium">${selectedOrder.total_amount.toLocaleString('es-CL')}</span>
                                     </div>
-                                    {/* Asumo que el envío está incluido o es cero, esto es placeholder si no hay desglose en el objeto */}
                                     <div className="flex justify-between border-t border-dashed mt-2 pt-2">
                                         <span className="font-bold text-base">Total:</span>
-                                        <span className="font
+                                        <span className="font-bold text-base text-[#2D4A3E]">${selectedOrder.total_amount.toLocaleString('es-CL')}</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div>
+                                <h3 className="text-sm font-bold text-gray-800 mb-2">Datos del Cliente</h3>
+                                <div className="text-sm space-y-1 text-gray-600">
+                                    <p className="font-medium">{selectedOrder.customer?.name || 'Invitado'}</p>
+                                    <p>{selectedOrder.customer?.email || 'N/A'}</p>
+                                    <p>{selectedOrder.customer?.phone || 'N/A'}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        {/* Shipping Address */}
+                        <div>
+                            <h3 className="text-sm font-bold text-gray-800 mb-2">Dirección de Envío</h3>
+                            <div className="text-sm text-gray-600">
+                                <p>{selectedOrder.shipping_address?.address || 'Sin dirección registrada.'}</p>
+                                <p>{selectedOrder.shipping_address?.city || 'N/A'}, {selectedOrder.shipping_address?.region || 'N/A'}</p>
+                            </div>
+                        </div>
+
+                        {/* Items List */}
+                        <div>
+                            <h3 className="text-sm font-bold text-gray-800 mb-2">Detalle de Productos ({selectedOrder.items?.length || 0})</h3>
+                            <div className="border rounded-lg divide-y bg-white">
+                                {(selectedOrder.items || []).map((item: any, index: number) => (
+                                    <div key={index} className="flex justify-between p-3 text-sm">
+                                        <span className="text-gray-700">{item.product_name}</span>
+                                        <span className="font-medium text-gray-500">{item.quantity} x ${item.price.toLocaleString('es-CL')}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+
+
+                    </div>
+                </div>
+            ) : (
+                <div className="hidden md:flex flex-1 items-center justify-center text-gray-400 border border-dashed rounded-xl h-full bg-white">
+                    <div className="text-center">
+                        <Eye size={36} className="mx-auto mb-2" />
+                        <p>Selecciona un pedido para ver los detalles.</p>
+                    </div>
+                </div>
+            )}
+        </div>
+    );
+}
