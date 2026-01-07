@@ -1,16 +1,5 @@
 import supabase from '@/lib/supabase';
 
-<<<<<<< HEAD
-export const getInputs = async () => {
-    const { data, error } = await supabase.from('inputs').select('*').order('name');
-    if (error) throw new Error(error.message);
-    return data;
-};
-
-export const updateInputStock = async (id: string, newQuantity: number) => {
-    const { error } = await supabase.from('inputs').update({ stock_quantity: newQuantity }).eq('id', id);
-    if (error) throw new Error(error.message);
-=======
 export interface InputItem {
     id: string;
     name: string;
@@ -46,7 +35,7 @@ export const getInputs = async () => {
 };
 
 /**
- * Create or restock an input.
+ * Update stock of an input item.
  */
 export const updateInputStock = async (id: string, newQuantity: number) => {
     const { data, error } = await supabase
@@ -61,9 +50,7 @@ export const updateInputStock = async (id: string, newQuantity: number) => {
 };
 
 /**
- * Use an input (creates a usage record and optionally triggers stock deduction).
- * For simplicity, we'll do the stock deduction here in a JS transaction-like flow
- * unless a DB trigger is preferred later.
+ * Use an input (creates a usage record and deducts stock).
  */
 export const useInput = async (usage: Partial<InputUsage>) => {
     if (!usage.input_id || !usage.quantity_used) throw new Error('Missing input_id or quantity_used');
@@ -105,5 +92,4 @@ export const createInputItem = async (item: Partial<InputItem>) => {
 
     if (error) throw new Error(`Error creating input item: ${error.message}`);
     return data as InputItem;
->>>>>>> 4af7fc6 (Fix: Aplicado downgrade de Next.js y React a versiones estables)
 };
