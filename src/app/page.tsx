@@ -1,7 +1,13 @@
 import Navbar from "@/components/layout/Navbar";
+<<<<<<< HEAD
 import { Button } from "@/components/ui/Button";
 import { ProductCard } from "@/components/ui/ProductCard";
 import Image from "next/image";
+=======
+import Image from "next/image";
+import { Button } from "@/components/ui/Button";
+import { ProductCard } from "@/components/ui/ProductCard";
+>>>>>>> 4af7fc6 (Fix: Aplicado downgrade de Next.js y React a versiones estables)
 
 export default function Home() {
   return (
@@ -34,11 +40,17 @@ export default function Home() {
               Cosechada a mano en El Monte. Sin procesar, 100% natural y llena de nutrientes para tu conejo o cobaya.
             </p>
             <div className="flex gap-4 justify-center">
+<<<<<<< HEAD
               <a href="/shop">
                 <Button className="text-lg px-8 py-4 shadow-xl hover:scale-105 transition-transform">
                   Ver Packs Disponibles
                 </Button>
               </a>
+=======
+              <Button className="text-lg px-8 py-4 shadow-xl hover:scale-105 transition-transform">
+                Ver Packs Disponibles
+              </Button>
+>>>>>>> 4af7fc6 (Fix: Aplicado downgrade de Next.js y React a versiones estables)
             </div>
           </div>
         </div>
@@ -68,7 +80,11 @@ export default function Home() {
       {/* Benefits Section */}
       <section className="py-24 bg-white">
 
+<<<<<<< HEAD
         <div className="container mx-auto px-4">
+=======
+        <div className="container">
+>>>>>>> 4af7fc6 (Fix: Aplicado downgrade de Next.js y React a versiones estables)
           <div className="text-center mb-16">
             <h2 className="text-4xl font-bold text-[#2D4A3E] mb-4">¿Por qué Alfa.Monte?</h2>
             <p className="text-lg text-gray-600">No es solo heno, es salud para tu pequeño amigo.</p>
@@ -104,7 +120,11 @@ export default function Home() {
 
       {/* Product Highlight Section */}
       <section className="py-24 bg-[#F4F1EA]">
+<<<<<<< HEAD
         <div className="container mx-auto px-4">
+=======
+        <div className="container">
+>>>>>>> 4af7fc6 (Fix: Aplicado downgrade de Next.js y React a versiones estables)
           <h2 className="text-4xl font-bold text-[#2D4A3E] mb-12 text-center">Nuestros Formatos</h2>
 
           <div className="grid md:grid-cols-3 gap-8">

@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+Allow: /product/
+Allow: /shop
+
+# AdsBot-Google needs access to all product and landing pages to verify content/prices
+User-agent: AdsBot-Google
+Allow: /
+
+Sitemap: https://alfamonte.cl/sitemap.xml

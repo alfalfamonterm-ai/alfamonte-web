@@ -125,3 +125,7 @@ export async function POST(req: NextRequest) {
         }, { status: 500 });
     }
 }
+<<<<<<< HEAD
+=======
+
+>>>>>>> 4af7fc6 (Fix: Aplicado downgrade de Next.js y React a versiones estables)

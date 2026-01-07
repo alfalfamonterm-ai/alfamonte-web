@@ -20,4 +20,8 @@
   h6 {
     @apply font-merriweather text-[#2D4A3E];
   }
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> 4af7fc6 (Fix: Aplicado downgrade de Next.js y React a versiones estables)

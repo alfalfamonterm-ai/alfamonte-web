@@ -47,7 +47,11 @@ function PaymentContent() {
                 <div className="flex justify-center">
                     <Wallet
                         initialization={{ preferenceId: preferenceId }}
+<<<<<<< HEAD
                         customization={{ texts: { valueProp: 'smart_option' } }}
+=======
+
+>>>>>>> 4af7fc6 (Fix: Aplicado downgrade de Next.js y React a versiones estables)
                     />
                 </div>
             ) : (
