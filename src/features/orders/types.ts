@@ -12,26 +12,17 @@ export interface OrderItem {
     created_at?: string;
 }
 
+// Interfaz para el cliente, que ahora incluye el campo 'phone'
+interface CustomerInfo {
+    name: string;
+    email: string;
+    phone: string; // <-- ¡NUEVO! Campo que se carga desde orders.db
+}
+
 export interface Order {
     id: string;
     customer_id?: string;
-<<<<<<< HEAD
-    customer?: { name: string, email: string };
-    guest_info?: any;
-    total_amount: number;
-    subtotal: number;
-    shipping_cost: number;
-    status: OrderStatus;
-    payment_status: PaymentStatus;
-    payment_method?: string;
-    shipping_address?: string;
-    shipping_method?: string;
-    created_at: string;
-    updated_at: string;
-    notes?: string;
-    items?: OrderItem[];
-=======
-    customer?: { name: string, email: string }; // joined
+    customer?: CustomerInfo; // Usamos la interfaz CustomerInfo
     guest_info?: any;
 
     total_amount: number;
@@ -60,5 +51,4 @@ export interface CreateOrderDTO {
     shipping_method?: string;
     shipping_address?: string;
     notes?: string;
->>>>>>> 4af7fc6 (Fix: Aplicado downgrade de Next.js y React a versiones estables)
 }
