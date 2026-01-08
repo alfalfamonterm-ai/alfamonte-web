@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Merriweather } from "next/font/google";
-import "./globals.css";
+// [ELIMINADA] La línea 'import "./globals.css";' ha sido eliminada.
 import { CartProvider } from "@/contexts/CartContext";
 import Footer from "@/components/layout/Footer";
 
@@ -30,7 +30,10 @@ export default function RootLayout({
         {/* Espacio para ID de conversión de Google Ads y píxel de seguimiento */}
         {/* <script async src={`https://www.googletagmanager.com/gtag/js?id=${process.env.NEXT_PUBLIC_GOOGLE_ADS_ID}`}></script> */}
       </head>
-      <body className={`${inter.variable} ${merriweather.variable}`}>
+      {/* [MODIFICACIÓN CLAVE]: Agregamos la clase de fondo 'bg-[#F4F1EA]' 
+        que estaba en globals.css directamente al body.
+      */}
+      <body className={`${inter.variable} ${merriweather.variable} bg-[#F4F1EA]`}>
         <CartProvider>
           {children}
           <Footer />
