@@ -74,3 +74,12 @@ export const updateOrderStatus = async (id: string, status: string, payment_stat
         if (rpcError) console.error("Stock Deduction Error:", rpcError);
     }
 };
+// FUNCIÓN AGREGADA PARA RESOLVER EL ERROR DE TYPESCRIPT EN EL HOOK useOrderManager
+export const updateOrderPaymentStatus = async (id: string, payment_status: string) => {
+    const { error } = await supabase
+        .from('orders')
+        .update({ payment_status }) // Solo actualiza el estado de pago
+        .eq('id', id);
+
+    if (error) throw new Error(error.message);
+};
