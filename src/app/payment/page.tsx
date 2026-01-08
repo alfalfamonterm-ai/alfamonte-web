@@ -47,7 +47,7 @@ function PaymentContent() {
                 <div className="flex justify-center">
                     <Wallet
                         initialization={{ preferenceId: preferenceId }}
-                        customization={{ texts: { valueProp: 'smart_option' } }} // Manteniendo la personalización
+                        // customization={{ texts: { valueProp: 'smart_option' } }} // <-- ELIMINADO: Estaba causando el error de tipo.
                     />
                 </div>
             ) : (
