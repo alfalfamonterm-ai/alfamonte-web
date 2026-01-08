@@ -1,5 +1,5 @@
 import supabase from '@/lib/supabase';
-import { CreateOrderDTO, Order } from '../../features/orders/types'; // <-- Conflicto 1 Resuelto
+import { CreateOrderDTO, Order } from '../../features/orders/types';
 
 export const getOrders = async () => {
     const { data, error } = await supabase
@@ -7,15 +7,15 @@ export const getOrders = async () => {
         .select(`
             *,
             items:order_items(*),
-            customer:customers(name, email)
-        `)
+            customer:customers(name, email, phone) 
+        `) // <-- ¡CORRECCIÓN CLAVE: Se agregó 'phone'!
         .order('created_at', { ascending: false });
 
     if (error) throw new Error(error.message);
-    return data as Order[]; // <-- Conflicto 2 Resuelto
+    return data as Order[];
 };
 
-export const createOrder = async (payload: CreateOrderDTO) => { // <-- Conflicto 2 (Añadido)
+export const createOrder = async (payload: CreateOrderDTO) => {
     // Transaction-like manually
     // 1. Calculate totals
     const subtotal = payload.items.reduce((acc, item) => acc + (item.quantity * item.unit_price), 0);
@@ -68,12 +68,13 @@ export const updateOrderStatus = async (id: string, status: string, payment_stat
 
     if (error) throw new Error(error.message);
 
-    // Trigger Stock Deduction if status is 'shipped' (Physically leaving) <-- Conflicto 3 Resuelto
+    // Trigger Stock Deduction if status is 'shipped' (Physically leaving)
     if (status === 'shipped') {
         const { error: rpcError } = await supabase.rpc('deduct_order_stock', { target_order_id: id });
         if (rpcError) console.error("Stock Deduction Error:", rpcError);
     }
 };
+
 // FUNCIÓN AGREGADA PARA RESOLVER EL ERROR DE TYPESCRIPT EN EL HOOK useOrderManager
 export const updateOrderPaymentStatus = async (id: string, payment_status: string) => {
     const { error } = await supabase
