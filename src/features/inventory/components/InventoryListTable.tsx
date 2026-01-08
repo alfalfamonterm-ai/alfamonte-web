@@ -1,5 +1,5 @@
 import React from 'react';
-import { InventoryItem } from '../../types';
+import { InventoryItem } from '../types'; // ¡CORRECCIÓN DE RUTA A '../types' EN LUGAR DE '../../types'!
 import { Edit, AlertTriangle, CheckCircle, Wrench } from 'lucide-react';
 
 interface InventoryListTableProps {
