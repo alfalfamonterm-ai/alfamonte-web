@@ -41,10 +41,7 @@ export interface InventoryMovement {
     total_cost?: number;
     created_at?: string;
     notes?: string;
-<<<<<<< HEAD
-=======
     // Joined fields
->>>>>>> 4af7fc6 (Fix: Aplicado downgrade de Next.js y React a versiones estables)
     item?: {
         name: string;
         unit: string;
