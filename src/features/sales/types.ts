@@ -11,8 +11,6 @@ export interface Product {
     stock: number;
     created_at?: string;
 }
-<<<<<<< HEAD
-=======
 
 export interface CreateProductDTO {
     title: string;
@@ -23,4 +21,3 @@ export interface CreateProductDTO {
     category?: string;
     image_src?: string;
 }
->>>>>>> 4af7fc6 (Fix: Aplicado downgrade de Next.js y React a versiones estables)
