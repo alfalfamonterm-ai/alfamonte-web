@@ -9,6 +9,8 @@ import {
     sendMissedPointsEmail
 } from '@/lib/resend';
 
+export const dynamic = 'force-dynamic';
+
 const client = new MercadoPagoConfig({
     accessToken: process.env.MP_ACCESS_TOKEN || '',
 });

@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { sendAbandonedCartEmail } from '@/lib/resend';
 
+export const dynamic = 'force-dynamic';
+
 // Admin client to bypass RLS
 const supabaseAdmin = createClient(
     process.env.SUPABASE_URL!,

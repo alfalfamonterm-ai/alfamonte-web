@@ -4,6 +4,8 @@ import supabase from '@/lib/supabase';
 import { Preference } from 'mercadopago';
 import { calculatePrice, calculateTotal } from '@/lib/pricing';
 
+export const dynamic = 'force-dynamic';
+
 export async function POST(req: NextRequest) {
     try {
         const body = await req.json();
