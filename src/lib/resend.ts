@@ -1,12 +1,19 @@
 import { Resend } from 'resend';
 
-const resend = new Resend(process.env.RESEND_API_KEY);
+
+let _resend: Resend | null = null;
+const getResend = () => {
+    if (!_resend) {
+        _resend = new Resend(process.env.RESEND_API_KEY || 're_dummy_for_build');
+    }
+    return _resend;
+};
 
 const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://alfamonte.cl';
 
 export const sendOrderConfirmationEmail = async (email: string, orderId: string, total: number) => {
     try {
-        const { data, error } = await resend.emails.send({
+        const { data, error } = await getResend().emails.send({
             from: 'Alfa.Monte <pedidos@alfamonte.cl>',
             to: email,
             subject: `Confirmación de Pedido #${orderId.slice(0, 8).toUpperCase()}`,
@@ -34,7 +41,7 @@ export const sendOrderConfirmationEmail = async (email: string, orderId: string,
 
 export const sendShippingUpdateEmail = async (email: string, orderId: string, status: string, provider?: string, tracking?: string) => {
     try {
-        const { error } = await resend.emails.send({
+        const { error } = await getResend().emails.send({
             from: 'Logística Alfa.Monte <despachos@alfamonte.cl>',
             to: email,
             subject: `Actualización de Envío: Pedido #${orderId.slice(0, 8).toUpperCase()}`,
@@ -57,7 +64,7 @@ export const sendShippingUpdateEmail = async (email: string, orderId: string, st
 
 export const sendLoyaltyPointsEmail = async (email: string, points: number, totalPoints: number) => {
     try {
-        const { error } = await resend.emails.send({
+        const { error } = await getResend().emails.send({
             from: 'Fidelidad Alfa.Monte <club@alfamonte.cl>',
             to: email,
             subject: `¡Has ganado ${points} puntos Alfa.Monte! 🌿`,
@@ -83,7 +90,7 @@ export const sendLoyaltyPointsEmail = async (email: string, points: number, tota
 export const sendAbandonedCartEmail = async (email: string, cartItems: any[]) => {
     try {
         const itemsList = cartItems.map(item => `<li>${item.quantity}x ${item.product_title || 'Producto'}</li>`).join('');
-        const { error } = await resend.emails.send({
+        const { error } = await getResend().emails.send({
             from: 'Alfa.Monte <hola@alfamonte.cl>',
             to: email,
             subject: '¿Olvidaste algo delicioso para tu mascota? 🌿',
@@ -107,7 +114,7 @@ export const sendAbandonedCartEmail = async (email: string, cartItems: any[]) =>
 
 export const sendWelcomeEmail = async (email: string, name: string) => {
     try {
-        const { error } = await resend.emails.send({
+        const { error } = await getResend().emails.send({
             from: 'Alfa.Monte <bienvenida@alfamonte.cl>',
             to: email,
             subject: '¡Bienvenido a la familia Alfa.Monte! 🌿',
@@ -134,7 +141,7 @@ export const sendWelcomeEmail = async (email: string, name: string) => {
 
 export const sendAccountCreatedEmail = async (email: string, tempPass: string, points: number) => {
     try {
-        const { error } = await resend.emails.send({
+        const { error } = await getResend().emails.send({
             from: 'Alfa.Monte <bievenida@alfamonte.cl>',
             to: email,
             subject: '🌿 Tu cuenta en Alfa.Monte ha sido creada',
@@ -163,7 +170,7 @@ export const sendAccountCreatedEmail = async (email: string, tempPass: string, p
 
 export const sendPasswordChangedConfirmationEmail = async (email: string) => {
     try {
-        await resend.emails.send({
+        await getResend().emails.send({
             from: 'Seguridad Alfa.Monte <seguridad@alfamonte.cl>',
             to: email,
             subject: '✅ Tu contraseña ha sido actualizada',
@@ -183,7 +190,7 @@ export const sendPasswordChangedConfirmationEmail = async (email: string) => {
 
 export const sendLoyaltyWelcomeEmail = async (email: string, name: string, points: number) => {
     try {
-        await resend.emails.send({
+        await getResend().emails.send({
             from: 'Fidelidad Alfa.Monte <club@alfamonte.cl>',
             to: email,
             subject: '✨ ¡Tus puntos ya son oficialmente tuyos!',
@@ -214,7 +221,7 @@ export const sendLoyaltyWelcomeEmail = async (email: string, name: string, point
 
 export const sendReviewRequestEmail = async (email: string, orderId: string) => {
     try {
-        const { error } = await resend.emails.send({
+        const { error } = await getResend().emails.send({
             from: 'Alfa.Monte <feedback@alfamonte.cl>',
             to: email,
             subject: '¿Qué te pareció tu pedido Alfa.Monte? 🐰',
@@ -237,7 +244,7 @@ export const sendReviewRequestEmail = async (email: string, orderId: string) => 
 export const sendMissedPointsEmail = async (email: string, missedPoints: number, totalMissed: number, purchaseCount: number) => {
     try {
         const plural = purchaseCount > 1 ? 's' : '';
-        await resend.emails.send({
+        await getResend().emails.send({
             from: 'Club Alfa.Monte <club@alfamonte.cl>',
             to: email,
             subject: '🌿 ¿Sabías que te estás perdiendo beneficios?',
@@ -288,7 +295,7 @@ export const sendMissedPointsEmail = async (email: string, missedPoints: number,
 
 export const sendPaymentReminderEmail = async (email: string, customerName: string, amount: number, dueDate: string, detail: string) => {
     try {
-        await resend.emails.send({
+        await getResend().emails.send({
             from: 'Cobranza Alfa.Monte <finanzas@alfamonte.cl>',
             to: email,
             subject: `Recordatorio de Pago: Saldo Pendiente $${amount.toLocaleString()} 🌾`,
@@ -326,7 +333,7 @@ export const sendPaymentReminderEmail = async (email: string, customerName: stri
 
 export const sendAdminDebtAlert = async (customerName: string, amount: number, daysOverdue: number, detail: string) => {
     try {
-        await resend.emails.send({
+        await getResend().emails.send({
             from: 'Sistema Alfa.Monte <alertas@alfamonte.cl>',
             to: 'fardosalfamonte@gmail.com', // Admin email
             subject: `⚠️ ALERTA DE DEUDA: ${customerName} ($${amount.toLocaleString()})`,
