@@ -42,7 +42,9 @@ export async function POST(req: NextRequest) {
             currency_id: 'CLP',
         }));
 
-        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
+        const protocol = req.headers.get('x-forwarded-proto') || 'http';
+        const host = req.headers.get('host');
+        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || `${protocol}://${host}`;
 
         // Create preference
         const result = await preference.create({
