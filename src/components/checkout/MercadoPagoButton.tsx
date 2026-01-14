@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { initMercadoPago, Wallet } from '@mercadopago/sdk-react';
 
 // Initialize with Public Key - Elegimos la versión más robusta y sin conflicto
-initMercadoPago(process.env.N_P_MP_PUBLIC_KEY || process.env.NEXT_PUBLIC_MERCADO_PAGO_PUBLIC_KEY || process.env.NEXT_PUBLIC_MP_FRONTEND_KEY || process.env.MP_FRONTEND_KEY!);
+initMercadoPago(process.env.NEXT_PUBLIC_MERCADO_PAGO_PUBLIC_KEY!);
 
 interface MercadoPagoButtonProps {
     product: {
@@ -44,7 +44,7 @@ export default function MercadoPagoButton({ product }: MercadoPagoButtonProps) {
         return (
             <Wallet
                 initialization={{ preferenceId: preferenceId }}
-                // Personalización problemática eliminada
+            // Personalización problemática eliminada
             />
         );
     }
