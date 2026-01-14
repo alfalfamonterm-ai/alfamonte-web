@@ -5,12 +5,12 @@ import { sendAbandonedCartEmail } from '@/lib/resend';
 export const dynamic = 'force-dynamic';
 
 // Admin client to bypass RLS
-const supabaseAdmin = createClient(
-    process.env.SUPABASE_URL!,
-    process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
 
 export async function GET(req: NextRequest) {
+    const supabaseAdmin = createClient(
+        process.env.SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
     try {
         // Authenticate (enforce cron secret)
         const authHeader = req.headers.get('authorization');

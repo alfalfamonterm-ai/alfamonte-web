@@ -1,12 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { createClient } from '@supabase/supabase-js';
 import client from '@/lib/mercadopago';
-import supabase from '@/lib/supabase';
 import { Preference } from 'mercadopago';
 import { calculatePrice, calculateTotal } from '@/lib/pricing';
 
 export const dynamic = 'force-dynamic';
 
+
 export async function POST(req: NextRequest) {
+    const supabaseAdmin = createClient(
+        process.env.SUPABASE_URL!,
+        process.env.SUPABASE_SERVICE_ROLE_KEY!
+    );
     try {
         const body = await req.json();
         const { items, customer } = body;
@@ -69,7 +74,7 @@ export async function POST(req: NextRequest) {
         });
 
         // 1. Insert into Orders table
-        const { data: order, error: orderError } = await supabase.from('orders').insert({
+        const { data: order, error: orderError } = await supabaseAdmin.from('orders').insert({
             guest_info: {
                 firstName: customer.firstName,
                 lastName: customer.lastName,
@@ -85,9 +90,9 @@ export async function POST(req: NextRequest) {
                     additionalInfo: customer.additionalInfo
                 }
             },
-            total_amount: totalAmount.toString(),
-            subtotal: totalAmount.toString(),
-            shipping_cost: "0",
+            total_amount: totalAmount,
+            subtotal: totalAmount,
+            shipping_cost: 0,
             status: 'pending',
             payment_status: 'pending',
             payment_method: 'mercadopago',
@@ -97,7 +102,10 @@ export async function POST(req: NextRequest) {
             mp_preference_id: result.id
         }).select().single();
 
-        if (orderError) throw orderError;
+        if (orderError) {
+            console.error('Error inserting order:', orderError);
+            throw new Error(`Error en base de datos (Order): ${orderError.message}`);
+        }
 
         // 2. Insert into Order Items
         const orderItems = items.map((item: any) => ({
@@ -109,8 +117,11 @@ export async function POST(req: NextRequest) {
             product_title: item.product.title
         }));
 
-        const { error: itemsError } = await supabase.from('order_items').insert(orderItems);
-        if (itemsError) throw itemsError;
+        const { error: itemsError } = await supabaseAdmin.from('order_items').insert(orderItems);
+        if (itemsError) {
+            console.error('Error inserting order items:', itemsError);
+            throw new Error(`Error en base de datos (Items): ${itemsError.message}`);
+        }
 
         return NextResponse.json({
             id: result.id,

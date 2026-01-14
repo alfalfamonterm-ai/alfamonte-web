@@ -28,7 +28,9 @@ export default function ProductEditorPage({ params }: { params: { id: string } }
         category: 'Caballos',
         image_src: '',
         slug: '',
-        stock: '0'
+        stock: '0',
+        is_subscription_enabled: false,
+        mp_plan_id: ''
     });
 
     useEffect(() => {
@@ -47,14 +49,17 @@ export default function ProductEditorPage({ params }: { params: { id: string } }
                 category: data.category || 'Caballos',
                 image_src: data.image_src || '',
                 slug: data.slug || '',
-                stock: data.stock || '0'
+                stock: data.stock || '0',
+                is_subscription_enabled: data.is_subscription_enabled || false,
+                mp_plan_id: data.mp_plan_id || ''
             });
         }
         setLoading(false);
     };
 
     const handleChange = (e: any) => {
-        setForm({ ...form, [e.target.name]: e.target.value });
+        const value = e.target.type === 'checkbox' ? e.target.checked : e.target.value;
+        setForm({ ...form, [e.target.name]: value });
     };
 
     const generateSlug = (title: string) => {
@@ -77,15 +82,44 @@ export default function ProductEditorPage({ params }: { params: { id: string } }
             };
 
             let error;
+            let productData;
+
             if (isNew) {
-                const { error: err } = await supabase.from('products').insert(payload);
+                const { data, error: err } = await supabase.from('products').insert(payload).select().single();
                 error = err;
+                productData = data;
             } else {
-                const { error: err } = await supabase.from('products').update(payload).eq('id', params.id);
+                const { data, error: err } = await supabase.from('products').update(payload).eq('id', params.id).select().single();
                 error = err;
+                productData = data;
             }
 
             if (error) throw error;
+
+            // --- SYNC WITH MERCADO PAGO ---
+            if (payload.price > 0) {
+                try {
+                    const syncResponse = await fetch('/api/admin/products/sync', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            ...payload,
+                            is_subscription_enabled: form.is_subscription_enabled,
+                            mp_plan_id: form.mp_plan_id
+                        }),
+                    });
+
+                    const syncData = await syncResponse.json();
+                    if (syncData.mp_plan_id && syncData.mp_plan_id !== form.mp_plan_id) {
+                        // Update product with the new MP Plan ID
+                        await supabase.from('products').update({ mp_plan_id: syncData.mp_plan_id }).eq('id', productData.id);
+                    }
+                } catch (syncErr) {
+                    console.error('Failed to sync with MP:', syncErr);
+                    // We don't block the whole save if sync fails, but alert the user
+                    alert('Atención: El producto se guardó pero la sincronización con Mercado Pago falló.');
+                }
+            }
 
             alert(`Producto ${isNew ? 'creado' : 'actualizado'} con éxito.`);
             router.push('/admin/products');
@@ -141,6 +175,28 @@ export default function ProductEditorPage({ params }: { params: { id: string } }
                 <div>
                     <label className="block text-sm font-bold text-gray-700 mb-1">Descripción</label>
                     <textarea name="description" rows={4} value={form.description} onChange={handleChange} className="w-full p-2 border rounded resize-none" />
+                </div>
+
+                <div className="bg-[#F8F9FA] p-4 rounded-lg border border-gray-200">
+                    <div className="flex items-center gap-3">
+                        <input
+                            type="checkbox"
+                            id="is_subscription_enabled"
+                            name="is_subscription_enabled"
+                            checked={form.is_subscription_enabled}
+                            onChange={handleChange}
+                            className="w-5 h-5 accent-[#2D4A3E]"
+                        />
+                        <div>
+                            <label htmlFor="is_subscription_enabled" className="block text-sm font-bold text-[#2D4A3E]">Activar como Suscripción</label>
+                            <p className="text-xs text-gray-500">Se creará un Plan Mensual automáticamente en Mercado Pago.</p>
+                        </div>
+                    </div>
+                    {form.mp_plan_id && (
+                        <div className="mt-3 text-[10px] text-gray-400 font-mono">
+                            ID Plan MP: {form.mp_plan_id}
+                        </div>
+                    )}
                 </div>
 
                 <div>

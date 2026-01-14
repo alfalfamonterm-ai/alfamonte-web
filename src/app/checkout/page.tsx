@@ -174,7 +174,7 @@ function CheckoutContent() {
                 if (data.id) {
                     router.push(`/payment?preference_id=${data.id}`);
                 } else {
-                    alert('Error al procesar el pago. Intenta nuevamente.');
+                    alert(`Error al procesar el pago: ${data.details || data.error || 'Intenta nuevamente'}`);
                 }
             }
         } catch (error) {

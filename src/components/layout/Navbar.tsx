@@ -56,7 +56,7 @@ export default function Navbar() {
                             </span>
                         )}
                     </Link>
-                    <Link href="/admin" className="px-4 py-2 bg-[#2D4A3E] text-white rounded-md hover:bg-[#3E6052] transition-colors">
+                    <Link href="/admin" className="px-4 py-2 bg-[#2D4A3E] text-white rounded-md hover:bg-[#3E6052] transition-colors" prefetch={false}>
                         Admin
                     </Link>
                 </div>
