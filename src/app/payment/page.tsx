@@ -13,7 +13,7 @@ function PaymentContent() {
     const [isMPLoaded, setIsMPLoaded] = useState(false);
 
     useEffect(() => {
-        const publicKey = process.env.N_P_MP_PUBLIC_KEY || process.env.NEXT_PUBLIC_MERCADO_PAGO_PUBLIC_KEY;
+        const publicKey = process.env.NEXT_PUBLIC_MERCADO_PAGO_PUBLIC_KEY;
         if (publicKey) {
             initMercadoPago(publicKey, { locale: 'es-CL' });
             setIsMPLoaded(true);
@@ -47,7 +47,7 @@ function PaymentContent() {
                 <div className="flex justify-center">
                     <Wallet
                         initialization={{ preferenceId: preferenceId }}
-                        // customization={{ texts: { valueProp: 'smart_option' } }} // <-- ELIMINADO: Estaba causando el error de tipo.
+                    // customization={{ texts: { valueProp: 'smart_option' } }} // <-- ELIMINADO: Estaba causando el error de tipo.
                     />
                 </div>
             ) : (

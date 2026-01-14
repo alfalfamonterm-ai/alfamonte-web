@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import { MercadoPagoConfig, Payment } from 'mercadopago';
-import { 
-    sendOrderConfirmationEmail, 
-    sendLoyaltyPointsEmail, 
-    sendWelcomeEmail, 
-    sendAccountCreatedEmail, 
-    sendMissedPointsEmail 
+import {
+    sendOrderConfirmationEmail,
+    sendLoyaltyPointsEmail,
+    sendWelcomeEmail,
+    sendAccountCreatedEmail,
+    sendMissedPointsEmail
 } from '@/lib/resend';
 
 const client = new MercadoPagoConfig({
@@ -15,7 +15,7 @@ const client = new MercadoPagoConfig({
 
 // Admin client for backend updates (bypasses RLS)
 const supabaseAdmin = createClient(
-    process.env.N_P_SUPABASE_URL || process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
@@ -82,7 +82,7 @@ export async function POST(req: NextRequest) {
                             .from('orders')
                             .insert({
                                 // Use guest_info for consistency, but only include key data
-                                guest_info: { email: sub.customer_email }, 
+                                guest_info: { email: sub.customer_email },
                                 total_amount: payment.transaction_amount,
                                 subtotal: payment.transaction_amount,
                                 status: 'processing',
@@ -168,7 +168,7 @@ export async function POST(req: NextRequest) {
 
                             // 4.5 Send Welcome Email / Create Auth User if new customer
                             const pointsThisPurchase = Math.floor(fullOrder.total_amount / 1000);
-                            
+
                             if (!existingCust) {
                                 // Attempt to create Supabase Auth User automatically
                                 const tempPassword = Math.random().toString(36).slice(-8) + 'A1!';
@@ -198,7 +198,7 @@ export async function POST(req: NextRequest) {
                             }
 
                             // 5. Loyalty Points Allocation / FOMO Campaign
-                            
+
                             // Only allocate points if:
                             // a) It's the first purchase (!existingCust) 
                             // b) OR the account is already UNLOCKED (points_locked === false).

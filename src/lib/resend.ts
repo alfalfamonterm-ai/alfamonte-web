@@ -2,7 +2,7 @@ import { Resend } from 'resend';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
-const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL || 'https://alfamonte.cl';
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || 'https://alfamonte.cl';
 
 export const sendOrderConfirmationEmail = async (email: string, orderId: string, total: number) => {
     try {
