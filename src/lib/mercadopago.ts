@@ -1,7 +1,14 @@
-import MercadoPagoConfig from 'mercadopago';
+import { MercadoPagoConfig } from 'mercadopago';
 
-const client = new MercadoPagoConfig({
-    accessToken: process.env.MP_ACCESS_TOKEN!
-});
+let _mpClient: MercadoPagoConfig | null = null;
 
-export default client;
+export const getMPClient = () => {
+    if (!_mpClient) {
+        _mpClient = new MercadoPagoConfig({
+            accessToken: process.env.MP_ACCESS_TOKEN || 'test_access_token'
+        });
+    }
+    return _mpClient;
+};
+
+export default getMPClient;

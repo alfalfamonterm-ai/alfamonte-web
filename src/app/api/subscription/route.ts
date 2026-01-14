@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import client from '@/lib/mercadopago';
+import { getMPClient } from '@/lib/mercadopago';
 import { PreApproval } from 'mercadopago';
 
 export const dynamic = 'force-dynamic';
@@ -13,7 +13,8 @@ export async function POST(req: NextRequest) {
             return NextResponse.json({ error: 'Falta información de la suscripción' }, { status: 400 });
         }
 
-        const preApproval = new PreApproval(client);
+        const mpClient = getMPClient();
+        const preApproval = new PreApproval(mpClient);
 
         const externalRef = `SUB-${Date.now()}-${Math.floor(Math.random() * 1000)}`;
 

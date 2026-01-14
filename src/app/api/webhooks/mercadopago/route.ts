@@ -9,18 +9,18 @@ import {
     sendMissedPointsEmail
 } from '@/lib/resend';
 
-export const dynamic = 'force-dynamic';
+import { getMPClient } from '@/lib/mercadopago';
 
-const client = new MercadoPagoConfig({
-    accessToken: process.env.MP_ACCESS_TOKEN || '',
-});
+export const dynamic = 'force-dynamic';
 
 
 export async function POST(req: NextRequest) {
     const supabaseAdmin = createClient(
-        process.env.SUPABASE_URL!,
-        process.env.SUPABASE_SERVICE_ROLE_KEY!
+        process.env.SUPABASE_URL || '',
+        process.env.SUPABASE_SERVICE_ROLE_KEY || ''
     );
+    const mpClient = getMPClient();
+
     try {
         const body = await req.json();
         console.log('--- Webhook Received ---', body);
@@ -34,9 +34,8 @@ export async function POST(req: NextRequest) {
             // can be added here to update the 'subscriptions' table.
         }
 
-        // 2. Handle Payments
         if (type === 'payment' && (action === 'payment.created' || action === 'created') && data?.id) {
-            const payment = (await new Payment(client).get({ id: data.id })) as any;
+            const payment = (await new Payment(mpClient).get({ id: data.id })) as any;
 
             if (payment.status === 'approved') {
                 const orderId = payment.external_reference;

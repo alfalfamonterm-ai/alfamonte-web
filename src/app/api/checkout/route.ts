@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import client from '@/lib/mercadopago';
+import { getMPClient } from '@/lib/mercadopago';
 import { Preference } from 'mercadopago';
 import { calculatePrice, calculateTotal } from '@/lib/pricing';
 
@@ -8,10 +8,13 @@ export const dynamic = 'force-dynamic';
 
 
 export async function POST(req: NextRequest) {
+    // 0. Initialize Admin Clients
     const supabaseAdmin = createClient(
-        process.env.SUPABASE_URL!,
-        process.env.SUPABASE_SERVICE_ROLE_KEY!
+        process.env.SUPABASE_URL || '',
+        process.env.SUPABASE_SERVICE_ROLE_KEY || ''
     );
+    const mpClient = getMPClient();
+
     try {
         const body = await req.json();
         const { items, customer } = body;
@@ -21,7 +24,7 @@ export async function POST(req: NextRequest) {
         }
 
         // Initialize Preference resource
-        const preference = new Preference(client);
+        const preference = new Preference(mpClient);
 
         // Generate unique Order ID
         const externalRef = `ORDER-${Date.now()}-${Math.floor(Math.random() * 1000)}`;

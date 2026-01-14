@@ -170,16 +170,22 @@ function CheckoutContent() {
                     }),
                 });
 
-                const data = await response.json();
+                let data;
+                try {
+                    data = await response.json();
+                } catch (jsonError) {
+                    throw new Error(`Error en el servidor (${response.status}).`);
+                }
+
                 if (data.id) {
                     router.push(`/payment?preference_id=${data.id}`);
                 } else {
                     alert(`Error al procesar el pago: ${data.details || data.error || 'Intenta nuevamente'}`);
                 }
             }
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error:', error);
-            alert('Error al procesar el pago');
+            alert(`Error al procesar el pago: ${error.message || 'Intenta nuevamente'}`);
         } finally {
             setLoading(false);
         }
