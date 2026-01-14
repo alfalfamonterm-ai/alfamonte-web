@@ -13,7 +13,7 @@ function PaymentContent() {
     const [isMPLoaded, setIsMPLoaded] = useState(false);
 
     useEffect(() => {
-        const publicKey = process.env.NEXT_PUBLIC_MERCADO_PAGO_PUBLIC_KEY;
+        const publicKey = process.env.MP_FRONTEND_KEY;
         if (publicKey) {
             initMercadoPago(publicKey, { locale: 'es-CL' });
             setIsMPLoaded(true);

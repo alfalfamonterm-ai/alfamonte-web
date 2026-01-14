@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { initMercadoPago, Wallet } from '@mercadopago/sdk-react';
 
 // Initialize with Public Key - Elegimos la versión más robusta y sin conflicto
-initMercadoPago(process.env.NEXT_PUBLIC_MERCADO_PAGO_PUBLIC_KEY!);
+initMercadoPago(process.env.MP_FRONTEND_KEY!);
 
 interface MercadoPagoButtonProps {
     product: {
