@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Merriweather } from "next/font/google";
-// [ELIMINADA] La línea 'import "./globals.css";' ha sido eliminada.
+import "./globals.css";
 import { CartProvider } from "@/contexts/CartContext";
 import Footer from "@/components/layout/Footer";
 
