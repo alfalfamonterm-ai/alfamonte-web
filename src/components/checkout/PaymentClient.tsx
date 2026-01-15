@@ -75,11 +75,6 @@ export default function PaymentClient({ mpPublicKey }: PaymentClientProps) {
                 <div className="flex justify-center min-h-[70px]">
                     <Wallet
                         initialization={{ preferenceId: preferenceId }}
-                        customization={{
-                            texts: {
-                                valueProp: 'smart_option'
-                            }
-                        }}
                     />
                 </div>
             ) : (
