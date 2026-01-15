@@ -65,7 +65,7 @@ export default function PaymentClient({ mpPublicKey }: PaymentClientProps) {
     return (
         <div className="max-w-md mx-auto bg-white rounded-xl p-8 shadow-sm text-center">
             <h1 className="text-2xl font-bold text-[#2D4A3E] mb-6 font-merriweather">
-                Preparando el Pago
+                Preparando Pago [v2]
             </h1>
             <p className="text-gray-600 mb-8">
                 Haz click en el botón de abajo para pagar de forma segura con Mercado Pago.
