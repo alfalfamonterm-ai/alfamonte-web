@@ -139,10 +139,14 @@ export async function POST(req: NextRequest) {
         });
 
     } catch (error: any) {
-        console.error('Error procesando checkout:', error);
+        console.error('❌ CRITICAL CHECKOUT ERROR:', error);
+        // Log details about the customer / items that failed to be saved
+        if (req.body) console.error('Failed Payload:', JSON.stringify(await req.clone().json()));
+
         return NextResponse.json({
             error: 'Error al procesar el pedido',
-            details: error.message
+            details: error.message,
+            code: 'CHECKOUT_FAILED'
         }, { status: 500 });
     }
 }
