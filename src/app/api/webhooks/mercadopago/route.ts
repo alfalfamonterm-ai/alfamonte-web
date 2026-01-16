@@ -13,7 +13,6 @@ import { getMPClient } from '@/lib/mercadopago';
 
 export const dynamic = 'force-dynamic';
 
-
 export async function POST(req: NextRequest) {
     const supabaseAdmin = createClient(
         process.env.SUPABASE_URL || '',
@@ -21,9 +20,27 @@ export async function POST(req: NextRequest) {
     );
     const mpClient = getMPClient();
 
+    let logId: string | null = null;
+
     try {
         const body = await req.json();
-        console.log('--- Webhook Received ---', body);
+        const headers = Object.fromEntries(req.headers.entries());
+
+        // 0. LOG INCOMING WEBHOOK
+        const { data: logData, error: logError } = await supabaseAdmin
+            .from('webhook_logs')
+            .insert({
+                payload: body,
+                status: 'received',
+                headers: headers
+            })
+            .select('id')
+            .single();
+
+        if (logData) logId = logData.id;
+        if (logError) console.error('Error logging webhook:', logError);
+
+        console.log('--- Webhook Received & Logged ---', body);
 
         const { action, type, data } = body;
 
@@ -34,7 +51,11 @@ export async function POST(req: NextRequest) {
             // can be added here to update the 'subscriptions' table.
         }
 
+        let processStatus = 'ignored';
+        let processError = null;
+
         if (type === 'payment' && (action === 'payment.created' || action === 'created') && data?.id) {
+            processStatus = 'processing';
             const payment = (await new Payment(mpClient).get({ id: data.id })) as any;
 
             if (payment.status === 'approved') {
@@ -63,6 +84,10 @@ export async function POST(req: NextRequest) {
                                 notes: (order.notes || '') + `\nPayment ID: ${payment.id}`
                             })
                             .eq('id', order.id);
+                        processStatus = 'success_order_updated';
+                    } else {
+                        processError = `Order not found for ref: ${orderId}`;
+                        console.error(processError);
                     }
                 }
                 // Case B: Recurring payment (Subscription)
@@ -105,6 +130,7 @@ export async function POST(req: NextRequest) {
                                 total_price: payment.transaction_amount,
                                 product_title: sub.products?.title || 'Suscripción'
                             });
+                            processStatus = 'success_subscription_order_created';
                         }
                     }
                 }
@@ -135,7 +161,10 @@ export async function POST(req: NextRequest) {
                             pano_id: '0' // convention for non-field specific sales
                         });
 
-                        if (opError) console.error('ERP Operation Sync Error:', opError);
+                        if (opError) {
+                            console.error('ERP Operation Sync Error:', opError);
+                            processError = `ERP Sync Error: ${opError.message}`;
+                        }
 
                         // 3. Deduct Stock (Using a Supabase function for atomicity)
                         const { error: stockError } = await supabaseAdmin.rpc('deduct_order_stock', {
@@ -256,13 +285,33 @@ export async function POST(req: NextRequest) {
                         }
                     }
                 }
+            } else {
+                processStatus = `ignored_status_${payment.status}`;
             }
+        }
+
+        // Update Log status
+        if (logId) {
+            await supabaseAdmin.from('webhook_logs').update({
+                status: processStatus,
+                error: processError
+            }).eq('id', logId);
         }
 
         return NextResponse.json({ received: true });
 
-    } catch (error) {
+    } catch (error: any) {
         console.error('Webhook Error:', error);
+
+        // Try to log the crash
+        try {
+            await supabaseAdmin.from('webhook_logs').insert({
+                payload: { crash: true },
+                status: 'crashed',
+                error: error.message
+            });
+        } catch (e) { }
+
         return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
     }
 }
