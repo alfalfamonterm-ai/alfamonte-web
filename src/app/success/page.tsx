@@ -21,7 +21,6 @@ function SuccessContent() {
         localStorage.removeItem('alfa-monte-cart');
 
         // Note: URL cleaning removed to prevent data loss on initial render
-        // The query params stick around but ensure the user sees their Order ID.
 
         // 2. Fire Confetti (Non-blocking)
         const duration = 3000;
@@ -45,7 +44,7 @@ function SuccessContent() {
                 origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 },
                 colors: ['#2D4A3E', '#8B5E3C', '#E8F5E9'],
                 disableForReducedMotion: true,
-                zIndex: 0 // CRITICAL: Low z-index so buttons work
+                zIndex: 0
             });
             confetti({
                 particleCount,
@@ -62,8 +61,12 @@ function SuccessContent() {
         return () => clearInterval(interval);
     }, [clearCart]);
 
+    // Force confetti canvas to not block clicks via style injection
     return (
         <div className="max-w-2xl mx-auto text-center py-12 relative z-10">
+            <style jsx global>{`
+                canvas { pointer-events: none !important; }
+            `}</style>
             <div className="text-8xl mb-8">🌿</div>
             <h1 className="text-4xl font-bold text-[#2D4A3E] mb-4 font-merriweather">
                 ¡Gracias por tu compra!
