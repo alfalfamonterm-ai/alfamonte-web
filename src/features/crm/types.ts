@@ -16,6 +16,9 @@ export interface Customer {
     created_at?: string;
     notes?: string;
     data_complete?: boolean; // NEW: Flag for incomplete customer data
+    reward_points?: number;
+    total_spent?: number; // Alias for total_purchased often returned by DB
+    last_purchase_at?: string; // Alias for last_purchase_date
 }
 
 export interface CreateCustomerDTO {
