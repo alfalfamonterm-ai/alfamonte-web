@@ -40,6 +40,9 @@ export default function AdminLayout({
                     <Link href="/admin/crm" className="block px-4 py-3 rounded-lg hover:bg-white/10 transition-colors">
                         👥 CRM Clientes
                     </Link>
+                    <Link href="/admin/reviews" className="block px-4 py-3 rounded-lg hover:bg-white/10 transition-colors">
+                        ⭐ Reseñas
+                    </Link>
                     <Link href="/admin/audit" className="block px-4 py-3 rounded-lg hover:bg-white/10 transition-colors">
                         🛡️ Registro de Auditoría
                     </Link>
