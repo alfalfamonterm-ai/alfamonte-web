@@ -63,7 +63,7 @@ function SuccessContent() {
     }, [clearCart]);
 
     return (
-        <div className="max-w-2xl mx-auto text-center py-12">
+        <div className="max-w-2xl mx-auto text-center py-12 relative z-10">
             <div className="text-8xl mb-8">🌿</div>
             <h1 className="text-4xl font-bold text-[#2D4A3E] mb-4 font-merriweather">
                 ¡Gracias por tu compra!
