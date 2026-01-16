@@ -2,6 +2,7 @@
 
 import { useCustomerManager } from '@/features/crm/hooks/useCustomerManager';
 import { Users, Plus, Phone, Mail, MapPin } from 'lucide-react';
+import Link from 'next/link';
 import { useState } from 'react';
 
 export default function CRMPage() {
@@ -79,8 +80,8 @@ export default function CRMPage() {
                                 </td>
                                 <td className="p-4">
                                     <span className={`px-2 py-1 text-xs rounded-full font-bold uppercase ${c.data_complete
-                                            ? 'bg-green-100 text-green-700'
-                                            : 'bg-orange-100 text-orange-700'
+                                        ? 'bg-green-100 text-green-700'
+                                        : 'bg-orange-100 text-orange-700'
                                         }`}>
                                         {c.data_complete ? 'Completo' : '⚠️ Incompleto'}
                                     </span>
@@ -89,7 +90,9 @@ export default function CRMPage() {
                                     ${(c.total_purchased || 0).toLocaleString()}
                                 </td>
                                 <td className="p-4 text-center">
-                                    <button className="text-gray-400 hover:text-[#2D4A3E]">Editar</button>
+                                    <Link href={`/admin/crm/${c.id}`} className="text-gray-400 hover:text-[#2D4A3E] font-medium hover:underline">
+                                        Editar
+                                    </Link>
                                 </td>
                             </tr>
                         ))}

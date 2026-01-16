@@ -2,20 +2,20 @@ import supabase from '@/lib/supabase';
 import { CreateCustomerDTO, Customer } from '../../features/crm/types';
 
 export const getCustomers = async (limit = 100) => {
-    // Fetch from history view to get purchase KPIs and IDs
+    // Fetch directly from customers table as it is the source of truth
     const { data, error } = await supabase
-        .from('customer_purchase_history')
+        .from('customers')
         .select('*')
-        .order('name')
+        .order('created_at', { ascending: false })
         .limit(limit);
 
     if (error) throw new Error(error.message);
 
-    // Map view columns to Customer type if needed
-    return (data || []).map(d => ({
+    // Map DB columns to Frontend Type
+    return (data || []).map((d: any) => ({
         ...d,
-        id: d.customer_id, // Map customer_id from view to id
-        total_purchased: Number(d.total_spent)
+        total_purchased: d.total_spent || 0,
+        last_purchase_date: d.last_purchase_at
     })) as Customer[];
 };
 
