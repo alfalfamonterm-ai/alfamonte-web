@@ -10,6 +10,12 @@ export default function OrderTrackingPage({ params }: { params: { id: string } }
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(false);
 
+    // Reviews State
+    const [rating, setRating] = useState(0);
+    const [reviewText, setReviewText] = useState('');
+    const [reviewSubmitting, setReviewSubmitting] = useState(false);
+    const [reviewSuccess, setReviewSuccess] = useState(false);
+
     useEffect(() => {
         const fetchOrder = async () => {
             // Try by ID first (UUID)
@@ -34,12 +40,34 @@ export default function OrderTrackingPage({ params }: { params: { id: string } }
                 setError(true);
             } else {
                 setOrder(data);
+                // Check if already reviewed (optional optimization)
             }
             setLoading(false);
         };
 
         fetchOrder();
     }, [params.id]);
+
+    const handleSubmitReview = async () => {
+        if (rating === 0) return;
+        setReviewSubmitting(true);
+
+        try {
+            await supabase.from('reviews').insert({
+                order_id: order.id,
+                rating,
+                comment: reviewText,
+                customer_email: order.guest_info?.email,
+                customer_name: `${order.guest_info?.firstName} ${order.guest_info?.lastName}`
+            });
+            setReviewSuccess(true);
+        } catch (err) {
+            console.error('Error submitting review:', err);
+            alert('Hubo un error al enviar tu reseña. Inténtalo de nuevo.');
+        } finally {
+            setReviewSubmitting(false);
+        }
+    };
 
     if (loading) return <div className="min-h-screen flex items-center justify-center text-gray-400 italic">Buscando tu pedido...</div>;
     if (error) return (
@@ -60,7 +88,6 @@ export default function OrderTrackingPage({ params }: { params: { id: string } }
     ];
 
     const currentStepIndex = timeline.findIndex(t => t.key === order.logistics_status);
-    // If status is in_transit, it sits between dispatched and delivered
     const effectiveStepIndex = order.logistics_status === 'in_transit' ? 2 : currentStepIndex;
 
     return (
@@ -130,23 +157,41 @@ export default function OrderTrackingPage({ params }: { params: { id: string } }
                     <h3 className="text-xl font-bold mb-4 font-merriweather text-[#2D4A3E]">¿Cómo fue tu experiencia?</h3>
                     <p className="text-sm text-gray-500 mb-6 font-medium">Tu opinión nos ayuda a seguir llevando lo mejor del campo a más hogares.</p>
 
-                    <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
-                        <div className="flex gap-2 mb-4 text-2xl">
-                            {['⭐', '⭐', '⭐', '⭐', '⭐'].map((s, i) => (
-                                <button key={i} className="hover:scale-125 transition-transform">
-                                    {s}
-                                </button>
-                            ))}
+                    {reviewSuccess ? (
+                        <div className="bg-green-50 p-6 rounded-2xl border border-green-100 text-center animate-fade-in">
+                            <div className="text-4xl mb-2">🎉</div>
+                            <h4 className="text-lg font-bold text-[#2D4A3E] mb-1">¡Gracias por tu opinión!</h4>
+                            <p className="text-sm text-gray-600">Nos ayuda mucho a mejorar.</p>
                         </div>
-                        <textarea
-                            className="w-full p-4 bg-gray-50 border-0 rounded-xl text-sm italic focus:ring-1 focus:ring-[#2D4A3E]/10 outline-none"
-                            placeholder="Cuéntanos qué te pareció el producto o el envío..."
-                            rows={3}
-                        ></textarea>
-                        <button className="mt-4 w-full bg-[#2D4A3E] text-white py-3 rounded-xl font-bold hover:bg-[#3E6052] transition-all">
-                            Enviar Reseña (+25 puntos)
-                        </button>
-                    </div>
+                    ) : (
+                        <div className="bg-white p-6 rounded-2xl border border-gray-100 shadow-sm">
+                            <div className="flex gap-2 mb-4 text-2xl justify-center sm:justify-start">
+                                {[1, 2, 3, 4, 5].map((star) => (
+                                    <button
+                                        key={star}
+                                        onClick={() => setRating(star)}
+                                        className={`transition-all hover:scale-125 ${rating >= star ? 'scale-110' : 'grayscale opacity-40 hover:grayscale-0 hover:opacity-100'}`}
+                                    >
+                                        ⭐
+                                    </button>
+                                ))}
+                            </div>
+                            <textarea
+                                className="w-full p-4 bg-gray-50 border-0 rounded-xl text-sm italic focus:ring-1 focus:ring-[#2D4A3E]/10 outline-none resize-none"
+                                placeholder="Cuéntanos qué te pareció el producto o el envío..."
+                                rows={3}
+                                value={reviewText}
+                                onChange={(e) => setReviewText(e.target.value)}
+                            ></textarea>
+                            <button
+                                onClick={handleSubmitReview}
+                                disabled={rating === 0 || reviewSubmitting}
+                                className="mt-4 w-full bg-[#2D4A3E] text-white py-3 rounded-xl font-bold hover:bg-[#3E6052] transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                            >
+                                {reviewSubmitting ? 'Enviando...' : 'Enviar Reseña (+25 puntos)'}
+                            </button>
+                        </div>
+                    )}
                 </div>
 
                 <div className="p-4 bg-gray-50 text-center">

@@ -15,19 +15,57 @@ function SuccessContent() {
     const externalReference = searchParams.get('external_reference');
 
     useEffect(() => {
-        // Clear cart on success
+        // 1. Clear cart and storage
         clearCart();
-        // Clear checkout data
         localStorage.removeItem('checkout-data');
         localStorage.removeItem('alfa-monte-cart');
 
-        // Fire confetti
-        confetti({
-            particleCount: 150,
-            spread: 70,
-            origin: { y: 0.6 },
-            colors: ['#2D4A3E', '#8B5E3C', '#E8F5E9']
-        });
+        // 2. Clean URL (Remove query params for cleaner UI)
+        if (window.history.replaceState) {
+            const url = new URL(window.location.href);
+            url.search = ''; // Remove query params
+            window.history.replaceState({}, '', url.toString());
+        }
+
+        // 3. Fire Confetti (Non-blocking)
+        const duration = 3000;
+        const animationEnd = Date.now() + duration;
+
+        const randomInRange = (min: number, max: number) => Math.random() * (max - min) + min;
+
+        const interval: any = setInterval(function () {
+            const timeLeft = animationEnd - Date.now();
+
+            if (timeLeft <= 0) {
+                return clearInterval(interval);
+            }
+
+            const particleCount = 50 * (timeLeft / duration);
+
+            // Start from both sides
+            confetti({
+                particleCount,
+                startVelocity: 30,
+                spread: 360,
+                ticks: 60,
+                origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 },
+                colors: ['#2D4A3E', '#8B5E3C', '#E8F5E9'],
+                disableForReducedMotion: true,
+                zIndex: 10 // Ensure it's not too high covering buttons
+            });
+            confetti({
+                particleCount,
+                startVelocity: 30,
+                spread: 360,
+                ticks: 60,
+                origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 },
+                colors: ['#2D4A3E', '#8B5E3C', '#E8F5E9'],
+                disableForReducedMotion: true,
+                zIndex: 10
+            });
+        }, 250);
+
+        return () => clearInterval(interval);
     }, [clearCart]);
 
     return (

@@ -44,7 +44,10 @@ export async function POST(req: NextRequest) {
 
         const protocol = req.headers.get('x-forwarded-proto') || 'http';
         const host = req.headers.get('host');
-        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || `${protocol}://${host}`;
+        // Force HTTPS in production or if host contains 'alfamonte.cl'
+        const isProd = host?.includes('alfamonte.cl') || protocol === 'https';
+        const finalProtocol = isProd ? 'https' : protocol;
+        const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || `${finalProtocol}://${host}`;
 
         // Create preference
         const result = await preference.create({
