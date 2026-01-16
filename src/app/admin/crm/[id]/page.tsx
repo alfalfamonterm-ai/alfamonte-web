@@ -51,11 +51,11 @@ export default function CustomerDetailPage() {
                 notes: c.notes || ''
             });
 
-            // 2. Get Orders
+            // 2. Get Orders (Filter by JSONB email)
             const { data: o } = await supabase
                 .from('orders')
                 .select('*')
-                .eq('customer_email', c.email) // Linking by email is safest for now
+                .filter('guest_info->>email', 'eq', c.email)
                 .order('created_at', { ascending: false });
 
             setOrders(o || []);
