@@ -77,7 +77,8 @@ export async function POST(req: NextRequest) {
                     order_id: externalRef,
                     customer_email: customer.email,
                     is_guest: true
-                }
+                },
+                notification_url: `${baseUrl}/api/webhooks/mercadopago`
             },
         });
 
