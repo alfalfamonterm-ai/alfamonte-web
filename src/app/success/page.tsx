@@ -20,8 +20,6 @@ function SuccessContent() {
         localStorage.removeItem('checkout-data');
         localStorage.removeItem('alfa-monte-cart');
 
-        // Note: URL cleaning removed to prevent data loss on initial render
-
         // 2. Fire Confetti (Non-blocking)
         const duration = 3000;
         const animationEnd = Date.now() + duration;
@@ -58,15 +56,26 @@ function SuccessContent() {
             });
         }, 250);
 
-        return () => clearInterval(interval);
+        // 3. Clean URL after short delay (User request)
+        const timer = setTimeout(() => {
+            if (typeof window !== 'undefined') {
+                const newUrl = window.location.pathname;
+                window.history.replaceState({}, '', newUrl);
+            }
+        }, 1500);
+
+        return () => {
+            clearInterval(interval);
+            clearTimeout(timer);
+        };
     }, [clearCart]);
 
-    // Force confetti canvas to not block clicks via style injection
     return (
-        <div className="max-w-2xl mx-auto text-center py-12 relative z-10">
+        <div className="max-w-2xl mx-auto text-center py-12 relative" style={{ zIndex: 50 }}>
             <style jsx global>{`
-                canvas { pointer-events: none !important; }
+                canvas { pointer-events: none !important; position: fixed !important; top: 0; left: 0; width: 100vw; height: 100vh; z-index: 0 !important; }
             `}</style>
+
             <div className="text-8xl mb-8">🌿</div>
             <h1 className="text-4xl font-bold text-[#2D4A3E] mb-4 font-merriweather">
                 ¡Gracias por tu compra!
@@ -75,23 +84,22 @@ function SuccessContent() {
                 Tu pedido ha sido recibido y está siendo procesado.
             </p>
 
-            <div className="bg-white rounded-xl p-8 shadow-sm mb-8 text-left border border-green-100">
+            <div className="bg-white rounded-xl p-8 shadow-sm mb-8 text-left border border-green-100 relative z-50">
                 <h2 className="font-bold text-[#2D4A3E] mb-4 text-lg">Resumen de la Transacción</h2>
                 <div className="space-y-2 text-sm text-gray-600">
-                    <p><span className="font-medium text-gray-800">ID de Pago:</span> {paymentId || 'Pendiente'}</p>
-                    <p><span className="font-medium text-gray-800">N° de Orden:</span> {externalReference || 'Pendiente'}</p>
+                    <p><span className="font-medium text-gray-800">ID de Pago:</span> {paymentId || 'Procesando...'}</p>
+                    <p><span className="font-medium text-gray-800">N° de Orden:</span> {externalReference || 'Asignando...'}</p>
 
-                    <div className="mt-6 p-4 bg-green-50 rounded-xl border border-green-100 flex items-center justify-between">
+                    <div className="mt-6 p-4 bg-green-50 rounded-xl border border-green-100 flex items-center justify-between relative z-50">
                         <div>
                             <p className="font-bold text-[#2D4A3E]">¡Listo para el envío!</p>
                             <p className="text-xs">Sigue tu pedido en tiempo real.</p>
                         </div>
-                        {externalReference && (
-                            <Link href={`/track/${externalReference}`}>
-                                <Button>Hacer Seguimiento</Button>
+                        {externalReference ? (
+                            <Link href={`/track/${externalReference}`} style={{ position: 'relative', zIndex: 100 }}>
+                                <Button className="relative z-50 cursor-pointer">Hacer Seguimiento</Button>
                             </Link>
-                        )}
-                        {!externalReference && (
+                        ) : (
                             <span className="text-xs text-orange-500 font-bold">Generando enlace...</span>
                         )}
                     </div>
@@ -102,17 +110,17 @@ function SuccessContent() {
                 </div>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                <Link href="/shop">
+            <div className="flex flex-col sm:flex-row gap-4 justify-center relative z-50">
+                <Link href="/shop" style={{ position: 'relative', zIndex: 100 }}>
                     <Button>Seguir Comprando</Button>
                 </Link>
-                <Link href="/blog">
+                <Link href="/blog" style={{ position: 'relative', zIndex: 100 }}>
                     <Button variant="outline">Ver Consejos de Cuidado</Button>
                 </Link>
             </div>
 
             <p className="mt-12 text-gray-500 text-sm">
-                ¿Tienes dudas? Contáctanos a <a href="mailto:hola@alfamonte.cl" className="underline">hola@alfamonte.cl</a>
+                ¿Tienes dudas? Contáctanos a <a href="mailto:hola@alfamonte.cl" className="underline relative z-50">hola@alfamonte.cl</a>
             </p>
         </div>
     );
