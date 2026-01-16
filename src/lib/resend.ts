@@ -19,14 +19,17 @@ export const sendOrderConfirmationEmail = async (email: string, orderId: string,
             subject: `Confirmación de Pedido #${orderId.slice(0, 8).toUpperCase()}`,
             html: `
                 <div style="font-family: sans-serif; color: #2D4A3E; max-width: 600px; margin: auto;">
-                    <h1 style="color: #2D4A3E;">¡Hola!</h1>
-                    <p>Hemos recibido tu pedido con éxito. Estamos preparando lo mejor del campo para tu mascota.</p>
-                    <div style="background: #F4F1EA; padding: 20px; border-radius: 10px;">
-                        <p><strong>N° de Orden:</strong> ${orderId.slice(0, 8).toUpperCase()}</p>
-                        <p><strong>Total:</strong> $${total.toLocaleString()}</p>
+                    <img src="https://images.unsplash.com/photo-1585110396067-bf0014455cfa?auto=format&fit=crop&w=600&q=80" alt="Conejito Feliz" style="width: 100%; height: 200px; object-fit: cover; border-radius: 10px 10px 0 0;" />
+                    <div style="padding: 20px; border: 1px solid #eee; border-top: none; border-radius: 0 0 10px 10px;">
+                        <h1 style="color: #2D4A3E; margin-top: 0;">¡Hola! 🐰</h1>
+                        <p>Hemos recibido tu pedido con éxito. Estamos preparando lo mejor del campo para tu mascota.</p>
+                        <div style="background: #F4F1EA; padding: 20px; border-radius: 10px;">
+                            <p><strong>N° de Orden:</strong> ${orderId.slice(0, 8).toUpperCase()}</p>
+                            <p><strong>Total:</strong> $${total.toLocaleString()}</p>
+                        </div>
+                        <p>Puedes seguir tu pedido aquí: <a href="${BASE_URL}/track/${orderId}">Seguimiento en Tiempo Real</a></p>
+                        <p>¡Gracias por confiar en Alfa.Monte!</p>
                     </div>
-                    <p>Puedes seguir tu pedido aquí: <a href="${BASE_URL}/track/${orderId}">Seguimiento en Tiempo Real</a></p>
-                    <p>¡Gracias por confiar en Alfa.Monte!</p>
                 </div>
             `
         });
@@ -147,18 +150,39 @@ export const sendAccountCreatedEmail = async (email: string, tempPass: string, p
             subject: '🌿 Tu cuenta en Alfa.Monte ha sido creada',
             html: `
                 <div style="font-family: sans-serif; color: #2D4A3E; max-width: 600px; margin: auto;">
-                    <h1>¡Bienvenido a la familia!</h1>
+                    <h1>¡Bienvenido a la familia! 🐰</h1>
                     <p>Hemos creado tu cuenta automáticamente con tu compra para que no pierdas tus puntos.</p>
-                    <div style="background: #F4F1EA; padding: 25px; border-radius: 20px; text-align: center; margin: 20px 0;">
-                        <p style="text-transform: uppercase; font-size: 11px; font-weight: bold; opacity: 0.6;">Credenciales Provisorias</p>
-                        <p><strong>Email:</strong> ${email}</p>
-                        <p><strong>Contraseña:</strong> ${tempPass}</p>
+                    
+                    <div style="background: #F4F1EA; padding: 25px; border-radius: 20px; border: 2px dashed #2D4A3E; margin: 20px 0;">
+                        <p style="text-transform: uppercase; font-size: 14px; font-weight: bold; margin-bottom: 15px;">🔑 Tu Llave de Acceso</p>
+                        
+                        <div style="background: white; padding: 15px; border-radius: 10px; margin-bottom: 10px;">
+                            <p style="margin: 0; font-size: 12px; color: #666;">Correo Electrónico:</p>
+                            <p style="margin: 5px 0 0 0; font-weight: bold; font-size: 16px;">${email}</p>
+                        </div>
+
+                        <div style="background: white; padding: 15px; border-radius: 10px;">
+                            <p style="margin: 0; font-size: 12px; color: #666;">Contraseña Provisoria:</p>
+                            <p style="margin: 5px 0 0 0; font-weight: bold; font-size: 20px; letter-spacing: 2px; color: #E53E3E;">${tempPass}</p>
+                        </div>
+                        <p style="font-size: 11px; margin-top: 10px; color: #666;">(Copia esta contraseña para ingresar)</p>
                     </div>
+
                     <div style="background: #FFF9E6; border: 1px solid #FFEBB3; padding: 20px; border-radius: 15px; margin-bottom: 20px;">
-                        <p style="margin: 0; color: #856404; font-weight: bold;">⚠️ Importante: Cambia tu contraseña en las próximas 24 horas</p>
-                        <p style="margin: 5px 0 0 0; font-size: 13px;">Debes cambiar tu contraseña para asegurar tus <strong>${points} puntos</strong>. Si no lo haces, los puntos caducarán para mantener la seguridad de la cuenta.</p>
+                        <p style="margin: 0; color: #856404; font-weight: bold;">👇 Pasos para activar tus ${points} puntos:</p>
+                        <ol style="margin: 10px 0 0 20px; font-size: 14px; color: #856404;">
+                            <li>Copia la contraseña provisoria de arriba.</li>
+                            <li>Haz clic en el botón verde.</li>
+                            <li>Pega la contraseña en "Password".</li>
+                            <li>Ve a "Mi Perfil" y crea una contraseña nueva.</li>
+                        </ol>
                     </div>
-                    <a href="${BASE_URL}/login" style="display: inline-block; background: #2D4A3E; color: white; padding: 15px 25px; border-radius: 10px; text-decoration: none; font-weight: bold;">Ingresar y Cambiar Contraseña</a>
+
+                    <div style="text-align: center;">
+                        <a href="${BASE_URL}/login?email=${encodeURIComponent(email)}" style="display: inline-block; background: #2D4A3E; color: white; padding: 15px 30px; border-radius: 10px; text-decoration: none; font-weight: bold; font-size: 16px; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+                            Ir a Iniciar Sesión
+                        </a>
+                    </div>
                 </div>
             `
         });
