@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Upload, X, Check, AlertCircle, Image as ImageIcon } from 'lucide-react';
+import { Upload, X, Check, AlertCircle, Image as ImageIcon, Link as LinkIcon } from 'lucide-react';
 import supabase from '@/lib/supabase';
 
 interface ImageUploaderProps {
@@ -11,19 +11,18 @@ interface ImageUploaderProps {
 export const ImageUploader: React.FC<ImageUploaderProps> = ({ value, onChange, folder = 'products' }) => {
     const [uploading, setUploading] = useState(false);
     const [error, setError] = useState<string | null>(null);
+    const [showManualUrl, setShowManualUrl] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
 
-        // Validation: WebP format
         if (file.type !== 'image/webp') {
             setError('La imagen debe estar en formato WebP para asegurar un sitio liviano.');
             return;
         }
 
-        // Validation: Size (Max 1MB)
         if (file.size > 1024 * 1024) {
             setError('La imagen es muy pesada. Debe pesar menos de 1MB.');
             return;
@@ -50,18 +49,27 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({ value, onChange, f
             onChange(publicUrl);
         } catch (err: any) {
             console.error('Upload error:', err);
-            setError('Error al subir la imagen. Asegúrate que existe el bucket "products" en Supabase.');
+            setError('Error al subir. Usa "URL Manual" si el bucket no está creado.');
         } finally {
             setUploading(false);
         }
     };
 
     return (
-        <div className="space-y-2">
-            <label className="block text-sm font-bold text-gray-700 mb-1">Imagen del Producto (WebP, máx 1MB)</label>
+        <div className="space-y-3 bg-gray-50 p-4 rounded-xl border border-gray-200">
+            <div className="flex justify-between items-center">
+                <label className="block text-sm font-bold text-gray-700">Imagen del Producto</label>
+                <button
+                    type="button"
+                    onClick={() => setShowManualUrl(!showManualUrl)}
+                    className="text-xs text-[#2D4A3E] font-bold flex items-center gap-1 hover:underline"
+                >
+                    <LinkIcon size={12} /> {showManualUrl ? 'Cerrar URL Manual' : 'Ingresar URL Manual'}
+                </button>
+            </div>
 
             <div className="flex items-start gap-4">
-                <div className="w-32 h-32 bg-gray-100 rounded-xl border-2 border-dashed border-gray-300 flex items-center justify-center overflow-hidden relative group">
+                <div className="w-24 h-24 bg-white rounded-xl border-2 border-dashed border-gray-300 flex items-center justify-center overflow-hidden relative group flex-shrink-0">
                     {value ? (
                         <>
                             <img src={value} alt="Preview" className="w-full h-full object-cover" />
@@ -73,7 +81,7 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({ value, onChange, f
                             </button>
                         </>
                     ) : (
-                        <ImageIcon className="text-gray-300" size={32} />
+                        <ImageIcon className="text-gray-300" size={24} />
                     )}
                     {uploading && (
                         <div className="absolute inset-0 bg-white/80 flex items-center justify-center">
@@ -82,38 +90,54 @@ export const ImageUploader: React.FC<ImageUploaderProps> = ({ value, onChange, f
                     )}
                 </div>
 
-                <div className="flex-1">
-                    <input
-                        type="file"
-                        ref={fileInputRef}
-                        onChange={handleFileChange}
-                        accept="image/webp"
-                        className="hidden"
-                    />
-                    <button
-                        type="button"
-                        onClick={() => fileInputRef.current?.click()}
-                        disabled={uploading}
-                        className="flex items-center gap-2 px-4 py-2 border-2 border-[#2D4A3E] text-[#2D4A3E] rounded-lg font-bold hover:bg-[#2D4A3E] hover:text-white transition-all disabled:opacity-50"
-                    >
-                        <Upload size={18} />
-                        {uploading ? 'Subiendo...' : 'Cargar Imagen .webp'}
-                    </button>
+                <div className="flex-1 space-y-2">
+                    {showManualUrl ? (
+                        <div className="animate-in slide-in-from-top-1">
+                            <input
+                                value={value}
+                                onChange={(e) => onChange(e.target.value)}
+                                placeholder="https://ejemplo.com/imagen.webp"
+                                className="w-full p-2 text-sm border rounded-lg focus:ring-2 focus:ring-green-500 outline-none"
+                            />
+                            <p className="text-[10px] text-gray-400 mt-1">Ingresa el link directo de la imagen.</p>
+                        </div>
+                    ) : (
+                        <>
+                            <input
+                                type="file"
+                                ref={fileInputRef}
+                                onChange={handleFileChange}
+                                accept="image/webp"
+                                className="hidden"
+                            />
+                            <button
+                                type="button"
+                                onClick={() => fileInputRef.current?.click()}
+                                disabled={uploading}
+                                className="flex items-center gap-2 px-4 py-2 bg-white border-2 border-[#2D4A3E] text-[#2D4A3E] rounded-lg text-sm font-bold hover:bg-[#2D4A3E] hover:text-white transition-all disabled:opacity-50"
+                            >
+                                <Upload size={16} />
+                                {uploading ? 'Subiendo...' : 'Subir WebP (máx 1MB)'}
+                            </button>
+                        </>
+                    )}
 
-                    <p className="mt-2 text-xs text-gray-500 italic">
-                        Recomendado: 800x800 px para mejores resultados.
-                    </p>
+                    {!showManualUrl && (
+                        <p className="text-[10px] text-gray-500 italic">
+                            WebP recomendado para mejor rendimiento.
+                        </p>
+                    )}
 
                     {error && (
-                        <div className="mt-2 flex items-center gap-1 text-red-500 text-xs font-bold animate-pulse">
-                            <AlertCircle size={14} />
+                        <div className="mt-2 flex items-center gap-1 text-red-500 text-[10px] font-bold">
+                            <AlertCircle size={12} />
                             {error}
                         </div>
                     )}
-                    {value && !error && (
-                        <div className="mt-2 flex items-center gap-1 text-green-600 text-xs font-bold">
-                            <Check size={14} />
-                            Imagen cargada correctamente
+                    {value && !error && !uploading && !showManualUrl && (
+                        <div className="mt-2 flex items-center gap-1 text-green-600 text-[10px] font-bold">
+                            <Check size={12} />
+                            Imagen lista
                         </div>
                     )}
                 </div>

@@ -15,9 +15,11 @@ export const metadata: Metadata = {
   title: "Alfa.Monte | Heno Premium para Masota",
   description: "Directo del campo a tu casa. El mejor heno de alfalfa para conejos, cobayas y chinchillas.",
   icons: {
-    icon: '/images/logo.png',
-    shortcut: '/images/logo.png',
-    apple: '/images/logo.png',
+    icon: [
+      { url: '/images/logo.png?v=2', type: 'image/png' },
+    ],
+    shortcut: '/images/logo.png?v=2',
+    apple: '/images/logo.png?v=2',
   },
   alternates: {
     canonical: 'https://alfamonte.cl'

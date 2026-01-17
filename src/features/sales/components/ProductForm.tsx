@@ -58,7 +58,7 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, onSave, o
 
     return (
         <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50 backdrop-blur-sm animate-in fade-in">
-            <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg flex flex-col max-h-[90vh]">
+            <div className="bg-white rounded-2xl shadow-xl w-full max-w-lg flex flex-col max-h-[90vh] overflow-hidden">
                 <div className="p-6 border-b flex justify-between items-center bg-gray-50 flex-shrink-0">
                     <h3 className="font-bold text-gray-800 text-lg">
                         {initialData ? 'Editar Producto' : 'Nuevo Producto'}
@@ -68,83 +68,85 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, onSave, o
                     </button>
                 </div>
 
-                <form onSubmit={handleSubmit} className="p-6 space-y-4 overflow-y-auto flex-1">
-                    <div>
-                        <label className="block text-sm font-bold text-gray-700 mb-1">Nombre del Producto</label>
-                        <input required value={title} onChange={e => setTitle(e.target.value)} className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-green-500 outline-none" placeholder="Ej. Fardo Alfalfa Premium" />
-                    </div>
-
-                    <div className="grid grid-cols-2 gap-4">
+                <form onSubmit={handleSubmit} className="overflow-hidden flex flex-col flex-1">
+                    <div className="p-6 space-y-4 overflow-y-auto flex-1 custom-scrollbar">
                         <div>
-                            <label className="block text-sm font-bold text-gray-700 mb-1">Precio Compra ($)</label>
-                            <input required type="number" value={price} onChange={e => setPrice(Number(e.target.value))} className="w-full p-3 border rounded-lg" />
+                            <label className="block text-sm font-bold text-gray-700 mb-1">Nombre del Producto</label>
+                            <input required value={title} onChange={e => setTitle(e.target.value)} className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-green-500 outline-none" placeholder="Ej. Fardo Alfalfa Premium" />
                         </div>
+
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <label className="block text-sm font-bold text-gray-700 mb-1">Precio Compra ($)</label>
+                                <input required type="number" value={price} onChange={e => setPrice(Number(e.target.value))} className="w-full p-3 border rounded-lg" />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-bold text-gray-700 mb-1">Stock Inicial</label>
+                                <input required type="number" value={stock} onChange={e => setStock(Number(e.target.value))} className="w-full p-3 border rounded-lg" />
+                            </div>
+                        </div>
+
                         <div>
-                            <label className="block text-sm font-bold text-gray-700 mb-1">Stock Inicial</label>
-                            <input required type="number" value={stock} onChange={e => setStock(Number(e.target.value))} className="w-full p-3 border rounded-lg" />
-                        </div>
-                    </div>
-
-                    <div>
-                        <div className="flex justify-between items-center mb-1">
-                            <label className="block text-sm font-bold text-gray-700">Categoría Web</label>
-                            <button
-                                type="button"
-                                onClick={() => setShowNewCategory(!showNewCategory)}
-                                className="text-xs text-[#2D4A3E] font-bold flex items-center gap-1 hover:underline"
-                            >
-                                <Plus size={12} /> {showNewCategory ? 'Cancelar' : 'Nueva Categoría'}
-                            </button>
-                        </div>
-
-                        {showNewCategory ? (
-                            <div className="flex gap-2 animate-in slide-in-from-top-1">
-                                <input
-                                    value={newCategoryName}
-                                    onChange={e => setNewCategoryName(e.target.value)}
-                                    placeholder="Nombre de la nueva categoría..."
-                                    className="flex-1 p-3 border rounded-lg outline-none focus:ring-2 focus:ring-green-500"
-                                />
+                            <div className="flex justify-between items-center mb-1">
+                                <label className="block text-sm font-bold text-gray-700">Categoría Web</label>
                                 <button
                                     type="button"
-                                    onClick={async () => {
-                                        if (!newCategoryName) return;
-                                        const cat = await addCategory(newCategoryName);
-                                        if (cat) {
-                                            setCategory(cat.name);
-                                            setShowNewCategory(false);
-                                            setNewCategoryName('');
-                                        }
-                                    }}
-                                    className="px-4 py-2 bg-green-600 text-white rounded-lg font-bold hover:bg-green-700"
+                                    onClick={() => setShowNewCategory(!showNewCategory)}
+                                    className="text-xs text-[#2D4A3E] font-bold flex items-center gap-1 hover:underline"
                                 >
-                                    Crear
+                                    <Plus size={12} /> {showNewCategory ? 'Cancelar' : 'Nueva Categoría'}
                                 </button>
                             </div>
-                        ) : (
-                            <select value={category} onChange={e => setCategory(e.target.value)} className="w-full p-3 border rounded-lg bg-white">
-                                {categories.map(cat => (
-                                    <option key={cat.id} value={cat.name}>{cat.name}</option>
-                                ))}
-                            </select>
-                        )}
+
+                            {showNewCategory ? (
+                                <div className="flex gap-2 animate-in slide-in-from-top-1">
+                                    <input
+                                        value={newCategoryName}
+                                        onChange={e => setNewCategoryName(e.target.value)}
+                                        placeholder="Nombre de la nueva categoría..."
+                                        className="flex-1 p-3 border rounded-lg outline-none focus:ring-2 focus:ring-green-500"
+                                    />
+                                    <button
+                                        type="button"
+                                        onClick={async () => {
+                                            if (!newCategoryName) return;
+                                            const cat = await addCategory(newCategoryName);
+                                            if (cat) {
+                                                setCategory(cat.name);
+                                                setShowNewCategory(false);
+                                                setNewCategoryName('');
+                                            }
+                                        }}
+                                        className="px-4 py-2 bg-green-600 text-white rounded-lg font-bold hover:bg-green-700"
+                                    >
+                                        Crear
+                                    </button>
+                                </div>
+                            ) : (
+                                <select value={category} onChange={e => setCategory(e.target.value)} className="w-full p-3 border rounded-lg bg-white">
+                                    {categories.map(cat => (
+                                        <option key={cat.id} value={cat.name}>{cat.name}</option>
+                                    ))}
+                                </select>
+                            )}
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-bold text-gray-700 mb-1">Descripción</label>
+                            <textarea value={description} onChange={e => setDescription(e.target.value)} className="w-full p-3 border rounded-lg h-24" placeholder="Detalles para la web..." />
+                        </div>
+
+                        <div className="pt-2">
+                            <ImageUploader 
+                                value={imageSrc}
+                                onChange={setImageSrc}
+                            />
+                        </div>
                     </div>
 
-                    <div>
-                        <label className="block text-sm font-bold text-gray-700 mb-1">Descripción</label>
-                        <textarea value={description} onChange={e => setDescription(e.target.value)} className="w-full p-3 border rounded-lg h-24" placeholder="Detalles para la web..." />
-                    </div>
-
-                    <div className="pt-2">
-                        <ImageUploader
-                            value={imageSrc}
-                            onChange={setImageSrc}
-                        />
-                    </div>
-
-                    <div className="pt-4 flex gap-3 sticky bottom-0 bg-white border-t mt-4">
-                        <button type="button" onClick={onCancel} className="flex-1 py-3 border border-gray-300 rounded-xl font-bold text-gray-600 hover:bg-gray-50">Cancelar</button>
-                        <button type="submit" disabled={loading} className="flex-1 py-3 bg-[#2D4A3E] text-white rounded-xl font-bold hover:bg-[#1f352c] flex justify-center items-center gap-2">
+                    <div className="p-6 bg-gray-50 border-t flex gap-3 flex-shrink-0">
+                        <button type="button" onClick={onCancel} className="flex-1 py-3 border border-gray-300 rounded-xl font-bold text-gray-600 hover:bg-white transition-colors">Cancelar</button>
+                        <button type="submit" disabled={loading} className="flex-1 py-3 bg-[#2D4A3E] text-white rounded-xl font-bold hover:bg-[#1f352c] transition-colors flex justify-center items-center gap-2">
                             {loading ? 'Guardando...' : <><Save size={18} /> Guardar Producto</>}
                         </button>
                     </div>
