@@ -2,6 +2,7 @@ import Navbar from "@/components/layout/Navbar";
 import { getPostBySlug } from "@/lib/posts";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { ProductAdBanner } from "@/components/blog/ProductAdBanner";
 
 // Next.js 15+ Async Params
 export default async function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
@@ -44,10 +45,12 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
                     <div dangerouslySetInnerHTML={{ __html: post.content }} />
                 </div>
 
+                <ProductAdBanner category={post.category} />
+
                 <div className="mt-16 pt-8 border-t border-gray-100 text-center">
                     <p className="font-bold text-[#2D4A3E] mb-4">¿Te gustó este artículo?</p>
-                    <Link href="/shop" className="inline-block px-8 py-3 bg-[#2D4A3E] text-white rounded-lg font-bold hover:bg-[#3E6052] transition-colors">
-                        Ver Productos Relacionados
+                    <Link href={`/shop?category=${encodeURIComponent(post.category)}`} className="inline-block px-8 py-3 bg-[#2D4A3E] text-white rounded-lg font-bold hover:bg-[#3E6052] transition-colors">
+                        Ver Catálogo Especial para {post.category}
                     </Link>
                 </div>
             </article>

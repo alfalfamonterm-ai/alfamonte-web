@@ -2,8 +2,18 @@ import Navbar from "@/components/layout/Navbar";
 import Image from "next/image";
 import { Button } from "@/components/ui/Button";
 import { ProductCard } from "@/components/ui/ProductCard";
+import supabase from "@/lib/supabase";
 
-export default function Home() {
+export default async function Home() {
+    const { data: categories } = await supabase.from('product_categories').select('*').limit(4);
+
+    // Fallback if no categories in DB yet
+    const displayCategories = categories && categories.length > 0 ? categories : [
+        { name: "Conejos", slug: "conejos", description: "Crecimiento" },
+        { name: "Cobayas", slug: "cobayas", description: "Vit. C Boost" },
+        { name: "Chinchillas", slug: "chinchillas", description: "Mantención" },
+        { name: "Fardos", slug: "fardos", description: "Formato Clásico" },
+    ];
     return (
         <main className="min-h-screen pt-16">
             <Navbar />
@@ -49,16 +59,17 @@ export default function Home() {
                 <div className="container mx-auto px-4 text-center">
                     <h2 className="text-3xl font-bold text-[#2D4A3E] mb-12 font-merriweather">Busca por Mascota</h2>
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
-                        {[
-                            { name: "Conejo Junior", icon: "🐰", desc: "Crecimiento" },
-                            { name: "Conejo Adulto", icon: "🐇", desc: "Mantención" },
-                            { name: "Cuyes", icon: "🐹", desc: "Vit. C Boost" },
-                            { name: "Aves", icon: "🐔", desc: "Anti-Estrés" },
-                        ].map((pet, i) => (
-                            <a href="/shop" key={i} className="bg-white p-6 rounded-xl hover:shadow-lg transition-all hover:scale-105 block group">
-                                <div className="text-5xl mb-4 group-hover:scale-110 transition-transform">{pet.icon}</div>
-                                <h3 className="font-bold text-[#2D4A3E]">{pet.name}</h3>
-                                <p className="text-sm text-gray-500">{pet.desc}</p>
+                        {displayCategories.map((cat, i) => (
+                            <a href={`/shop?category=${encodeURIComponent(cat.slug)}`} key={i} className="bg-white p-6 rounded-3xl hover:shadow-xl transition-all hover:scale-105 block group border border-gray-100 shadow-sm">
+                                <div className="text-5xl mb-4 group-hover:rotate-12 transition-transform h-16 flex items-center justify-center">
+                                    {cat.image_url ? (
+                                        <img src={cat.image_url} alt={cat.name} className="h-full object-contain" />
+                                    ) : (
+                                        <span>🐾</span>
+                                    )}
+                                </div>
+                                <h3 className="font-bold text-[#2D4A3E] text-xl mb-1">{cat.name}</h3>
+                                <p className="text-xs text-gray-500 uppercase tracking-widest font-bold opacity-60">{cat.description || 'Ver productos'}</p>
                             </a>
                         ))}
                     </div>

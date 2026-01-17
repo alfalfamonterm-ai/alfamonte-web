@@ -3,8 +3,9 @@
 import { useState, useEffect } from 'react';
 import Navbar from "@/components/layout/Navbar";
 import { ProductCard } from "@/components/ui/ProductCard";
-import supabase from "@/lib/supabase"; // Ensure this is the client client
-import { Category } from "@/lib/products";
+import supabase from "@/lib/supabase";
+import { Category } from "@/features/sales/hooks/useCategories";
+import { useCategories } from "@/features/sales/hooks/useCategories";
 
 // Define Product Interface matching DB
 interface Product {
@@ -23,15 +24,12 @@ interface Product {
 export default function ShopPage() {
     const [products, setProducts] = useState<Product[]>([]);
     const [loading, setLoading] = useState(true);
-    const [activeCategory, setActiveCategory] = useState<Category | 'all'>('all');
+    const [activeCategory, setActiveCategory] = useState<string>('all');
+    const { categories, loading: categoriesLoading } = useCategories();
 
-    const dbCategories = [
-        { id: 'all', label: 'Todos' },
-        { id: 'Conejos', label: '🐰 Conejos' },
-        { id: 'Cobayas', label: '🐹 Cobayas' },
-        { id: 'Chinchillas', label: '🐁 Chinchillas' },
-        { id: 'Roedores', label: '🐀 Roedores' },
-        { id: 'Aves', label: '🐔 Aves' },
+    const displayCategories = [
+        { id: 'all', name: 'Todos' },
+        ...categories
     ];
 
     useEffect(() => {
@@ -71,16 +69,16 @@ export default function ShopPage() {
 
                 {/* Category Filter */}
                 <div className="flex flex-wrap justify-center gap-4 mb-12">
-                    {dbCategories.map((cat) => (
+                    {displayCategories.map((cat) => (
                         <button
                             key={cat.id}
-                            onClick={() => setActiveCategory(cat.id as any)}
-                            className={`px-6 py-2 rounded-full font-medium transition-all ${activeCategory === cat.id
-                                ? 'bg-[#2D4A3E] text-white shadow-md'
-                                : 'bg-white text-[#2D4A3E] hover:bg-[#E8F5E9]'
+                            onClick={() => setActiveCategory(cat.name === 'Todos' ? 'all' : cat.name)}
+                            className={`px-6 py-2 rounded-full font-medium transition-all ${(activeCategory === 'all' && cat.name === 'Todos') || activeCategory === cat.name
+                                    ? 'bg-[#2D4A3E] text-white shadow-md'
+                                    : 'bg-white text-[#2D4A3E] hover:bg-[#E8F5E9]'
                                 }`}
                         >
-                            {cat.label}
+                            {cat.name}
                         </button>
                     ))}
                 </div>

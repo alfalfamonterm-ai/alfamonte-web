@@ -5,6 +5,8 @@ import { notFound } from "next/navigation";
 import BuyButtons from "@/components/checkout/BuyButtons";
 import supabase from "@/lib/supabase";
 import { Metadata } from 'next';
+import { ProductRecommendations } from "@/components/shop/ProductRecommendations";
+import { BlogRecommendations } from "@/components/shop/BlogRecommendations";
 
 interface Product {
     id: string;
@@ -182,6 +184,25 @@ export default async function ProductPage({ params }: { params: Promise<{ slug: 
                             {product.usage_instructions || "Suministrar como complemento de la dieta diaria. Mantener siempre agua fresca a disposición. Almacenar en lugar fresco, seco y protegido de la luz solar directa."}
                         </p>
                     </div>
+                </div>
+
+                {/* Recommendations and Content */}
+                <div className="mt-16 space-y-16">
+                    <ProductRecommendations
+                        currentProductId={product.id}
+                        category={product.category}
+                        type="related"
+                    />
+
+                    <BlogRecommendations
+                        category={product.category}
+                    />
+
+                    <ProductRecommendations
+                        currentProductId={product.id}
+                        category={product.category}
+                        type="bought-together"
+                    />
                 </div>
             </div>
         </main>

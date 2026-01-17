@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { Product } from '../types';
-import { X, Save, Image as ImageIcon } from 'lucide-react';
+import { X, Save, Image as ImageIcon, Plus } from 'lucide-react';
+import { useCategories } from '../hooks/useCategories';
+import { ImageUploader } from './ImageUploader';
 
 interface ProductFormProps {
     initialData: Product | null;
@@ -16,6 +18,10 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, onSave, o
     const [description, setDescription] = useState('');
     const [imageSrc, setImageSrc] = useState('');
     const [loading, setLoading] = useState(false);
+    const [showNewCategory, setShowNewCategory] = useState(false);
+    const [newCategoryName, setNewCategoryName] = useState('');
+
+    const { categories, addCategory } = useCategories();
 
     useEffect(() => {
         if (initialData) {
@@ -80,13 +86,48 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, onSave, o
                     </div>
 
                     <div>
-                        <label className="block text-sm font-bold text-gray-700 mb-1">Categoría Web</label>
-                        <select value={category} onChange={e => setCategory(e.target.value)} className="w-full p-3 border rounded-lg bg-white">
-                            <option value="Fardos">Fardos</option>
-                            <option value="Pellets">Pellets</option>
-                            <option value="Semillas">Semillas</option>
-                            <option value="Servicios">Servicios</option>
-                        </select>
+                        <div className="flex justify-between items-center mb-1">
+                            <label className="block text-sm font-bold text-gray-700">Categoría Web</label>
+                            <button
+                                type="button"
+                                onClick={() => setShowNewCategory(!showNewCategory)}
+                                className="text-xs text-[#2D4A3E] font-bold flex items-center gap-1 hover:underline"
+                            >
+                                <Plus size={12} /> {showNewCategory ? 'Cancelar' : 'Nueva Categoría'}
+                            </button>
+                        </div>
+
+                        {showNewCategory ? (
+                            <div className="flex gap-2 animate-in slide-in-from-top-1">
+                                <input
+                                    value={newCategoryName}
+                                    onChange={e => setNewCategoryName(e.target.value)}
+                                    placeholder="Nombre de la nueva categoría..."
+                                    className="flex-1 p-3 border rounded-lg outline-none focus:ring-2 focus:ring-green-500"
+                                />
+                                <button
+                                    type="button"
+                                    onClick={async () => {
+                                        if (!newCategoryName) return;
+                                        const cat = await addCategory(newCategoryName);
+                                        if (cat) {
+                                            setCategory(cat.name);
+                                            setShowNewCategory(false);
+                                            setNewCategoryName('');
+                                        }
+                                    }}
+                                    className="px-4 py-2 bg-green-600 text-white rounded-lg font-bold hover:bg-green-700"
+                                >
+                                    Crear
+                                </button>
+                            </div>
+                        ) : (
+                            <select value={category} onChange={e => setCategory(e.target.value)} className="w-full p-3 border rounded-lg bg-white">
+                                {categories.map(cat => (
+                                    <option key={cat.id} value={cat.name}>{cat.name}</option>
+                                ))}
+                            </select>
+                        )}
                     </div>
 
                     <div>
@@ -94,14 +135,11 @@ export const ProductForm: React.FC<ProductFormProps> = ({ initialData, onSave, o
                         <textarea value={description} onChange={e => setDescription(e.target.value)} className="w-full p-3 border rounded-lg h-24" placeholder="Detalles para la web..." />
                     </div>
 
-                    <div>
-                        <label className="block text-sm font-bold text-gray-700 mb-1">Imagen URL</label>
-                        <div className="flex gap-2">
-                            <div className="p-3 bg-gray-100 rounded-lg text-gray-400">
-                                <ImageIcon size={20} />
-                            </div>
-                            <input value={imageSrc} onChange={e => setImageSrc(e.target.value)} className="flex-1 p-3 border rounded-lg" placeholder="https://..." />
-                        </div>
+                    <div className="pt-2">
+                        <ImageUploader
+                            value={imageSrc}
+                            onChange={setImageSrc}
+                        />
                     </div>
 
                     <div className="pt-4 flex gap-3 sticky bottom-0 bg-white border-t mt-4">
