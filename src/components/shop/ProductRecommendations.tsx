@@ -39,7 +39,17 @@ export const ProductRecommendations: React.FC<ProductRecommendationsProps> = asy
             <div className="flex gap-6 overflow-x-auto pb-8 scrollbar-hide snap-x h-full">
                 {displayProducts.slice(0, 4).map((p: any) => (
                     <div key={p.id} className="min-w-[280px] md:min-w-[320px] snap-start">
-                        <ProductCard product={p} />
+                        <ProductCard 
+                            id={p.id}
+                            title={p.title}
+                            price={p.price}
+                            weight={p.weight || '1 Kg'}
+                            slug={p.slug}
+                            imageSrc={p.image_src || '/images/placeholder.jpg'}
+                            description={p.description || ''}
+                            category={p.category || ''}
+                            stock={p.stock || 0}
+                        />
                     </div>
                 ))}
             </div>
