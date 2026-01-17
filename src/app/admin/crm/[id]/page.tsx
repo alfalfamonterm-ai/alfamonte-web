@@ -5,15 +5,17 @@ import { useParams, useRouter } from 'next/navigation';
 import { Customer } from '@/features/crm/types';
 import supabase from '@/lib/supabase';
 import { Button } from '@/components/ui/Button';
-import { ArrowLeft, Save, Trash2, ShoppingBag, Star } from 'lucide-react';
+import { ArrowLeft, Save, Trash2, ShoppingBag, Star, LayoutDashboard } from 'lucide-react';
 import { updateCustomer } from '@/lib/database/crm.db';
+import Link from 'next/link';
 
 export default function CustomerDetailPage() {
     const params = useParams();
     const router = useRouter();
     const [customer, setCustomer] = useState<Customer | null>(null);
     const [loading, setLoading] = useState(true);
-    const [orders, setOrders] = useState<any[]>([]);
+    const [webOrders, setWebOrders] = useState<any[]>([]);
+    const [erpOperations, setErpOperations] = useState<any[]>([]);
 
     // Form inputs
     const [formData, setFormData] = useState({
@@ -51,14 +53,24 @@ export default function CustomerDetailPage() {
                 notes: c.notes || ''
             });
 
-            // 2. Get Orders (Filter by JSONB email)
-            const { data: o } = await supabase
+            // 2. Get Web Orders (Filter by JSONB email)
+            const { data: orders } = await supabase
                 .from('orders')
                 .select('*')
                 .filter('guest_info->>email', 'eq', c.email)
                 .order('created_at', { ascending: false });
 
-            setOrders(o || []);
+            setWebOrders(orders || []);
+
+            // 3. Get ERP Operations (Sales)
+            const { data: operations } = await supabase
+                .from('operations')
+                .select('*')
+                .eq('customer_id', c.id)
+                .eq('category', 'Venta')
+                .order('date', { ascending: false });
+
+            setErpOperations(operations || []);
             setLoading(false);
         };
 
@@ -70,7 +82,7 @@ export default function CustomerDetailPage() {
         try {
             await updateCustomer(customer.id, formData);
             alert('Cliente actualizado correctamente');
-            router.refresh(); // Refresh server state if needed
+            router.refresh();
         } catch (e: any) {
             alert('Error al guardar: ' + e.message);
         }
@@ -79,8 +91,29 @@ export default function CustomerDetailPage() {
     if (loading) return <div className="p-12 text-center">Cargando perfil...</div>;
     if (!customer) return <div className="p-12 text-center">Cliente no encontrado</div>;
 
+    const allTransactions = [
+        ...webOrders.map(o => ({
+            id: o.id,
+            date: o.created_at,
+            type: 'WEB',
+            code: '#' + (o.external_reference || o.id.slice(0, 8)),
+            amount: o.total_amount,
+            status: o.status,
+            detail: 'Compra Online'
+        })),
+        ...erpOperations.map(op => ({
+            id: op.id,
+            date: op.date, // Note: date vs created_at
+            type: 'ERP',
+            code: 'OP-' + op.id.slice(0, 8),
+            amount: op.total_cost || op.amount_paid,
+            status: op.payment_status || 'Completado',
+            detail: `${op.subcategory || 'Venta'} (${op.description || ''})`
+        }))
+    ].sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+
     return (
-        <div className="max-w-5xl mx-auto pb-12">
+        <div className="max-w-6xl mx-auto pb-12">
             <Button variant="outline" onClick={() => router.back()} className="mb-6 flex items-center gap-2">
                 <ArrowLeft size={16} /> Volver
             </Button>
@@ -160,40 +193,45 @@ export default function CustomerDetailPage() {
                         </div>
                     </div>
 
-                    {/* Order History */}
+                    {/* Integrated History */}
                     <div className="bg-white p-8 rounded-xl shadow-sm border border-gray-100">
                         <h2 className="font-bold text-[#2D4A3E] mb-4 flex items-center gap-2">
-                            <ShoppingBag size={20} /> Historial de Pedidos
+                            <LayoutDashboard size={20} /> Historial de Transacciones (Web + ERP)
                         </h2>
-                        {orders.length === 0 ? (
-                            <p className="text-gray-400 italic">No hay pedidos registrados.</p>
+                        {allTransactions.length === 0 ? (
+                            <p className="text-gray-400 italic">No hay movimientos registrados.</p>
                         ) : (
                             <div className="overflow-x-auto">
                                 <table className="w-full text-sm">
                                     <thead className="bg-gray-50 text-gray-500 text-xs uppercase text-left">
                                         <tr>
-                                            <th className="p-3">Pedido</th>
+                                            <th className="p-3">Ref</th>
+                                            <th className="p-3">Tipo</th>
                                             <th className="p-3">Fecha</th>
-                                            <th className="p-3">Estado</th>
-                                            <th className="p-3 text-right">Total</th>
+                                            <th className="p-3">Detalle</th>
+                                            <th className="p-3 text-right">Monto</th>
                                         </tr>
                                     </thead>
                                     <tbody className="divide-y">
-                                        {orders.map(order => (
-                                            <tr key={order.id} className="hover:bg-gray-50">
-                                                <td className="p-3 font-mono font-bold text-[#2D4A3E]">
-                                                    #{order.external_reference || order.id.slice(0, 8)}
+                                        {allTransactions.map((tx: any) => (
+                                            <tr key={tx.id} className="hover:bg-gray-50">
+                                                <td className="p-3 font-mono font-bold text-gray-700 text-xs">
+                                                    {tx.code}
                                                 </td>
                                                 <td className="p-3">
-                                                    {new Date(order.created_at).toLocaleDateString('es-CL')}
-                                                </td>
-                                                <td className="p-3">
-                                                    <span className="px-2 py-1 rounded-full text-xs font-bold bg-gray-100 border text-gray-600 uppercase">
-                                                        {order.status || 'Pendiente'}
+                                                    <span className={`px-2 py-1 rounded-full text-xs font-bold uppercase border ${tx.type === 'WEB' ? 'bg-blue-50 text-blue-700 border-blue-100' : 'bg-purple-50 text-purple-700 border-purple-100'
+                                                        }`}>
+                                                        {tx.type}
                                                     </span>
                                                 </td>
-                                                <td className="p-3 text-right font-bold">
-                                                    ${(order.total_amount || 0).toLocaleString()}
+                                                <td className="p-3 text-gray-600">
+                                                    {new Date(tx.date).toLocaleDateString('es-CL')}
+                                                </td>
+                                                <td className="p-3 text-xs text-gray-600 max-w-[200px] truncate" title={tx.detail}>
+                                                    {tx.detail}
+                                                </td>
+                                                <td className="p-3 text-right font-bold text-[#2D4A3E]">
+                                                    ${(tx.amount || 0).toLocaleString()}
                                                 </td>
                                             </tr>
                                         ))}
@@ -223,12 +261,15 @@ export default function CustomerDetailPage() {
                                 <span className="font-bold text-xl">${(customer.total_spent || 0).toLocaleString()}</span>
                             </div>
                             <div className="flex justify-between items-center pb-4 border-b">
-                                <span className="text-gray-500 text-sm">Última Compra</span>
+                                <span className="text-gray-500 text-sm">Última Actividad</span>
                                 <span className="font-medium">
                                     {customer.last_purchase_at
                                         ? new Date(customer.last_purchase_at).toLocaleDateString('es-CL')
                                         : 'Nunca'}
                                 </span>
+                            </div>
+                            <div className="pt-2 text-xs text-gray-400 text-center">
+                                Incluye compras Web y Operaciones ERP
                             </div>
                         </div>
                     </div>
