@@ -12,8 +12,15 @@ const merriweather = Merriweather({
 });
 
 export const metadata: Metadata = {
-  title: "Alfa.Monte | Heno Premium para Mascotas",
+  title: "Alfa.Monte | Heno Premium para Masota",
   description: "Directo del campo a tu casa. El mejor heno de alfalfa para conejos, cobayas y chinchillas.",
+  icons: {
+    icon: [
+      { url: '/icon.png', type: 'image/png', sizes: '512x512' },
+    ],
+    shortcut: '/icon.png',
+    apple: '/icon.png',
+  },
   alternates: {
     canonical: 'https://alfamonte.cl'
   }
